@@ -1,0 +1,11 @@
+bot_proj_name = "MeloInf"
+
+bot_proj_ver = "1.0.0-a1"
+
+bot_proj_src = "<暂未开源>"
+
+bot_nickname = "律汐二代目"
+
+uni_cmd_start = ["*"]
+
+uni_cmd_sep = [' ']

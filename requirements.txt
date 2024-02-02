@@ -1,0 +1,2 @@
+aiohttp>=3.9.3
+melobot==2.0.0rc2
