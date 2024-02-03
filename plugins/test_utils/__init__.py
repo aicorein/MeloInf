@@ -1,6 +1,6 @@
 import asyncio as aio
 from random import randint
-from melobot import AttrSessionRule as AttrRule, User
+from melobot import AttrSessionRule as AttrRule, ArgFormatter as Format
 from melobot import Plugin, finish, get_id, send, send_hup, session
 from melobot import reply_msg, text_msg
 from melobot import BotHupTimeout
@@ -19,6 +19,15 @@ stest = Plugin.on_message(
 )
 test_n = Plugin.on_message(
     parser=PASER_GEN.gen(["测试统计", "test_n"]),
+    checker=ADMIN_CHECKER
+)
+echo = Plugin.on_message(
+    parser=PASER_GEN.gen(["复读", "echo"],
+                         formatters=[
+                             Format(verify=lambda x: len(x) <= 100,
+                                    src_desc="复读的内容",
+                                    src_expect="字符数 <= 100")
+                         ]),
     checker=ADMIN_CHECKER
 )
 
@@ -80,3 +89,8 @@ class TestUtils(Plugin):
     @test_n
     async def test_stat(self) -> None:
         await send(f"已进行的测试次数：{self.test_cnt}")
+
+    @echo
+    async def echo(self) -> None:
+        content = session.args.vals.pop(0)
+        await send(content)

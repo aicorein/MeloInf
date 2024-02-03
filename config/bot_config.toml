@@ -4,8 +4,12 @@
 CONNECT_HOST = "localhost"
 # websocket 连接服务的端口
 CONNECT_PORT = 8080
+# websocket 连接的最大重试次数（-1 为无限重试）
+MAX_CONN_TRY = -1
+# websocket 连接重试的间隔时间（-1 为无间隔）
+CONN_TRY_INTERVAL = 2
 # 全局日志等级（DEBUG, INFO, WARNING, ERROR, CRITICAL）
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "INFO"
 # 消息发送冷却时间（防止发送消息过快被风控）
 COOLDOWN_TIME = 0.25
 # 日志输出目录（会在该目录初始化 app.log 文件）
