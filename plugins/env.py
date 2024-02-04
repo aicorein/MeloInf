@@ -18,6 +18,7 @@ class BotInfo:
         self.bot_nickname = SETTINGS['bot_nickname']
         self.uni_cmd_start = SETTINGS['uni_cmd_start']
         self.uni_cmd_sep = SETTINGS['uni_cmd_sep']
+        self.uni_default_flag = SETTINGS['uni_default_flag']
 BOT_INFO = BotInfo()
 
 CHECKER_GEN = MsgCheckerGen(owner=CONFIG['owner'],

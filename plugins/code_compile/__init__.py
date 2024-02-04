@@ -2,19 +2,21 @@ from melobot import Plugin, send_reply, session
 from melobot import ArgFormatter as Format
 from melobot import CmdParser
 
-from ..env import COMMON_CHECKER, get_headers
+from ..env import COMMON_CHECKER, get_headers, BOT_INFO
 from ..utils import async_http
 
 
 code_c = Plugin.on_message(checker=COMMON_CHECKER, parser=CmdParser(
     cmd_start='*',
-    cmd_sep='---',
+    cmd_sep='$',
     target=["code", "代码"],
     formatters=[
         Format(convert=lambda x: x.lower(),
                verify=lambda x: x in ["cpp", "cs", "py"],
                src_desc="编程语言类型",
-               src_expect='是以下值之一（兼容大小写）：["cpp", "cs", "py"]'),
+               src_expect='是以下值之一（兼容大小写）：["cpp", "cs", "py"]',
+               default='py',
+               default_replace_flag=BOT_INFO.uni_default_flag),
         Format(verify=lambda x: len(x) <= 1000,
                src_desc="代码",
                src_expect="代码总字符数 <= 1000")

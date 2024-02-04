@@ -18,7 +18,7 @@ stest = Plugin.on_message(
     conflict_callback=send("其他的 session 测试进行中...稍后再试")
 )
 test_n = Plugin.on_message(
-    parser=PASER_GEN.gen(["测试统计", "test_n"]),
+    parser=PASER_GEN.gen(["测试统计", "testn", "test-stat"]),
     checker=ADMIN_CHECKER
 )
 echo = Plugin.on_message(
@@ -26,7 +26,8 @@ echo = Plugin.on_message(
                          formatters=[
                              Format(verify=lambda x: len(x) <= 100,
                                     src_desc="复读的内容",
-                                    src_expect="字符数 <= 100")
+                                    src_expect="字符数 <= 100",
+                                    default='Hello World!')
                          ]),
     checker=ADMIN_CHECKER
 )
