@@ -5,7 +5,7 @@ from melobot import Plugin
 from melobot import send, send_reply, finish
 from melobot import image_msg
 from ..env import PASER_GEN, COMMON_CHECKER, get_headers
-from ..utils import base64_encode, async_http
+from ..public_utils import base64_encode, async_http
 
 
 rpic = Plugin.on_message(parser=PASER_GEN.gen(['随机图', 'rpic']), checker=COMMON_CHECKER)

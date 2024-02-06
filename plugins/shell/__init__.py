@@ -12,6 +12,7 @@ from melobot import send, finish, get_metainfo
 from ..env import OWNER_CHECKER
 
 
+META_INFO = get_metainfo()
 shell = Plugin.on_message(checker=OWNER_CHECKER,
                           session_rule=AttrRule('sender', 'id'),
                           direct_rouse=True,
@@ -30,10 +31,9 @@ class ShellManager(Plugin):
     def __init__(self) -> None:
         super().__init__()
         self.shell: aio.subprocess.Process = None
-        self.executable = "powershell" if get_metainfo().PLATFORM == 'win32' else "sh"
-        self.encoding = 'utf-8' if get_metainfo().PLATFORM != 'win32' else 'gbk'
-        self.int_signal = signal.SIGINT if get_metainfo().PLATFORM != 'win32' else signal.CTRL_C_EVENT
-        self.line_sep = get_metainfo().LINE_SEP
+        self.executable = "powershell" if META_INFO.PLATFORM == 'win32' else "sh"
+        self.encoding = 'utf-8' if META_INFO.PLATFORM != 'win32' else 'gbk'
+        self.line_sep = META_INFO.LINE_SEP
         self.pointer: Tuple[int, bool, Union[int, None]] = None
         self.tasks: List[aio.Task] = None
 

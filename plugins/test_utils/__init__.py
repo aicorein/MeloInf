@@ -4,22 +4,22 @@ from melobot import AttrSessionRule as AttrRule, ArgFormatter as Format
 from melobot import Plugin, finish, get_id, send, send_hup, session
 from melobot import reply_msg, text_msg
 from melobot import BotHupTimeout
-from ..env import ADMIN_CHECKER, PASER_GEN
+from ..env import SU_CHECKER, PASER_GEN
 
 atest = Plugin.on_message(
     parser=PASER_GEN.gen(["异步测试", "atest", "async-test"]),
-    checker=ADMIN_CHECKER
+    checker=SU_CHECKER
 )
 stest = Plugin.on_message(
     parser=PASER_GEN.gen(["会话测试", "stest", "session-test"]),
-    checker=ADMIN_CHECKER,
+    checker=SU_CHECKER,
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
     conflict_callback=send("其他的 session 测试进行中...稍后再试")
 )
 test_n = Plugin.on_message(
     parser=PASER_GEN.gen(["测试统计", "testn", "test-stat"]),
-    checker=ADMIN_CHECKER
+    checker=SU_CHECKER
 )
 echo = Plugin.on_message(
     parser=PASER_GEN.gen(["复读", "echo"],
@@ -29,7 +29,7 @@ echo = Plugin.on_message(
                                     src_expect="字符数 <= 100",
                                     default='Hello World!')
                          ]),
-    checker=ADMIN_CHECKER
+    checker=SU_CHECKER
 )
 
 
@@ -61,7 +61,7 @@ class TestUtils(Plugin):
         id = session.event.sender.id
         resp = await send(f"会话测试开始。识别标记：{id}，模拟间隔：{self.session_t}s。输入 stop 可停止本次会话测试", wait=True)
         start_msg_id = resp.data['message_id']
-        await send_hup(f"是否启用时长为 {self.session_overtime_t}s 的超时测试功能？（y/n）")
+        await send_hup(f"是否启用时长为 {self.session_overtime_t}s 的会话超时功能？（y/n）")
         if session.event.text == 'y':
             overtime = True
 

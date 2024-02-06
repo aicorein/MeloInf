@@ -3,7 +3,7 @@ from melobot import ArgFormatter as Format
 from melobot import CmdParser
 
 from ..env import COMMON_CHECKER, get_headers, BOT_INFO
-from ..utils import async_http
+from ..public_utils import async_http
 
 
 code_c = Plugin.on_message(checker=COMMON_CHECKER, parser=CmdParser(

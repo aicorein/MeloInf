@@ -3,25 +3,27 @@ import datetime as dt
 from typing import List
 from melobot import Plugin, send, send_reply, get_metainfo
 from melobot import ArgFormatter as Format, AttrSessionRule as AttrRule
-from melobot import User, BotLife, bot, session
+from melobot import User, BotLife, bot, session, PriorityLevel
 
 from ..env import PASER_GEN, COMMON_CHECKER, BOT_INFO, CHECKER_GEN, OWNER_CHECKER
-from .recovery import read_restart_rec, save_restart_rec
+from .recovery import read_rec, save_rec
 
 
 META_INFO = get_metainfo()
+BOT_NICKNAME = BOT_INFO.bot_nickname
 info = Plugin.on_message(parser=PASER_GEN.gen(["info", "信息"]), checker=COMMON_CHECKER)
 auth = Plugin.on_message(parser=PASER_GEN.gen(["auth", "权限"]), checker=COMMON_CHECKER)
 status = Plugin.on_message(parser=PASER_GEN.gen(["status", "状态"]), checker=COMMON_CHECKER)
 life = Plugin.on_message(checker=OWNER_CHECKER, 
-                           session_rule=AttrRule('sender', 'id'),
-                           conflict_callback=send("工作状态切换中...稍后再试~"),
-                           parser=PASER_GEN.gen(["life", "状态设置"], 
-                                               formatters=[
-                                                   Format(verify=lambda x: x in ['on', 'off', 'close', 'restart'],
-                                                           src_desc="工作状态变更选项",
-                                                           src_expect="以下值之一：['on', 'off', 'close', 'restart']")
-                                               ]))
+                         session_rule=AttrRule('sender', 'id'),
+                         conflict_callback=send("工作状态切换中...稍后再试~"),
+                         priority=PriorityLevel.MIN,
+                         parser=PASER_GEN.gen(["life", "状态设置"], 
+                                              formatters=[
+                                                  Format(verify=lambda x: x in ['on', 'off', 'close', 'restart'],
+                                                         src_desc="工作状态变更选项",
+                                                         src_expect="以下值之一：['on', 'off', 'close', 'restart']")
+                                              ]))
 
 
 class LifeCycleUtils(Plugin):
@@ -29,7 +31,7 @@ class LifeCycleUtils(Plugin):
 
     def __init__(self) -> None:
         super().__init__()
-        self.restart_rec_name = 'restart.rec'
+        self.rec_name = 'restart.rec'
         self.start_moment = time.time()
         self.format_start_moment = dt.datetime.now().strftime('%m-%d %H:%M:%S')
 
@@ -51,16 +53,16 @@ class LifeCycleUtils(Plugin):
 
     @bot.on(BotLife.CONNECTED)
     async def restart_wake(self) -> None:
-        res = read_restart_rec(self.ROOT, self.restart_rec_name)
+        res = read_rec(self.ROOT, self.rec_name)
         if res is not None:
             sender_id, is_private, group_id = res
-            await session.custom_send("重启完成~", is_private, sender_id, group_id)
+            await session.custom_send(f"{BOT_NICKNAME} 重启完成~", is_private, sender_id, group_id)
             LifeCycleUtils.LOGGER.info("本次启动为指令触发的重启，已回复重启成功消息")
 
     @info
     async def info(self) -> None:
         output = " ● bot 昵称：{}\n ● 内核：{}\n ● 内核版本：{}\n ● 内核项目地址：{}\n ● bot 项目：{}\n ● bot 版本：{}\n ● bot 项目地址：{}".format(
-            BOT_INFO.bot_nickname,
+            BOT_NICKNAME,
             META_INFO.PROJ_NAME, f"v{META_INFO.VER}", META_INFO.PROJ_SRC,
             BOT_INFO.name, f"v{BOT_INFO.ver}", BOT_INFO.src
         )
@@ -76,12 +78,13 @@ class LifeCycleUtils(Plugin):
     async def auth(self) -> None:
         u_level = CHECKER_GEN.gen_base()._get_level(session.event)
         alist = [
+            BOT_NICKNAME,
             u_level >= User.OWNER,
             u_level >= User.SU,
             u_level >= User.WHITE,
             u_level >= User.USER,
         ]
-        output = "当前对 bot 具有权限：\n ● owner：{}\n ● superuser：{}\n ● white_user：{}\n ● user：{}".format(*alist)
+        output = "当前对 {} 具有权限：\n ● owner：{}\n ● superuser：{}\n ● white_user：{}\n ● user：{}".format(*alist)
         await send_reply(output)
 
     @status
@@ -101,21 +104,21 @@ class LifeCycleUtils(Plugin):
         match option:
             case 'on': 
                 if bot.is_activate:
-                    await send("bot 已经在工作啦~")
+                    await send(f"{BOT_NICKNAME} 已经在工作啦~")
                 else:
                     bot.activate()
-                    await send("bot 已恢复工作~")
+                    await send(f"{BOT_NICKNAME} 已恢复工作~")
             case 'off':
-                await send("bot 去休息了~")
+                await send(f"{BOT_NICKNAME} 去休息了~")
                 bot.slack()
             case 'close':
-                await send("bot 下班啦~")
+                await send(f"{BOT_NICKNAME} 下班啦~")
                 LifeCycleUtils.LOGGER.info("指令触发停止操作，正在关闭 bot")
                 await bot.close()
             case 'restart':
                 if bot.is_module_run():
-                    await send("bot 正在准备重启...")
-                    save_restart_rec(self.ROOT, self.restart_rec_name)
+                    await send(f"{BOT_NICKNAME} 正在准备重启...")
+                    save_rec(self.ROOT, self.rec_name)
                     await bot.restart()
                 else:
-                    await send("当前运行模式不支持重启哦，如需重启，请使用模块运行模式：\n python -m melobot main.py")
+                    await send(f"{BOT_NICKNAME} 当前运行模式不支持重启哦，如需重启，请使用模块运行模式：\npython -m melobot main.py")
