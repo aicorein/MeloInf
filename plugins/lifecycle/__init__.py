@@ -20,9 +20,9 @@ life = Plugin.on_message(checker=OWNER_CHECKER,
                          priority=PriorityLevel.MIN,
                          parser=PASER_GEN.gen(["life", "状态设置"], 
                                               formatters=[
-                                                  Format(verify=lambda x: x in ['on', 'off', 'close', 'restart'],
+                                                  Format(verify=lambda x: x in ['on', 'off', 'stop', 'restart', 're'],
                                                          src_desc="工作状态变更选项",
-                                                         src_expect="以下值之一：['on', 'off', 'close', 'restart']")
+                                                         src_expect="以下值之一：['on', 'off', 'stop', 'restart', 're']")
                                               ]))
 
 
@@ -61,14 +61,10 @@ class LifeCycleUtils(Plugin):
 
     @info
     async def info(self) -> None:
-        output = " ● bot 昵称：{}\n ● 内核：{}\n ● 内核版本：{}\n ● 内核项目地址：{}\n ● bot 项目：{}\n ● bot 版本：{}\n ● bot 项目地址：{}".format(
+        output = " ● bot 昵称：{}\n ● 内核：{} {}\n ● 内核项目地址：{}\n ● bot 项目：{} {}\n ● bot 项目地址：{}\n ● 运行平台：{}\n ● py 版本：{}".format(
             BOT_NICKNAME,
             META_INFO.PROJ_NAME, f"v{META_INFO.VER}", META_INFO.PROJ_SRC,
-            BOT_INFO.name, f"v{BOT_INFO.ver}", BOT_INFO.src
-        )
-        await send(output)
-
-        output = " ● 运行平台：{}\n ● py 版本：{}".format(
+            BOT_INFO.name, f"v{BOT_INFO.ver}", BOT_INFO.src,
             META_INFO.PLATFORM,
             META_INFO.PY_VER.split('|')[0]
         )
@@ -111,11 +107,11 @@ class LifeCycleUtils(Plugin):
             case 'off':
                 await send(f"{BOT_NICKNAME} 去休息了~")
                 bot.slack()
-            case 'close':
+            case 'stop':
                 await send(f"{BOT_NICKNAME} 下班啦~")
                 LifeCycleUtils.LOGGER.info("指令触发停止操作，正在关闭 bot")
                 await bot.close()
-            case 'restart':
+            case 'restart' | 're':
                 if bot.is_module_run():
                     await send(f"{BOT_NICKNAME} 正在准备重启...")
                     save_rec(self.ROOT, self.rec_name)

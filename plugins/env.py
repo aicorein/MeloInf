@@ -7,7 +7,8 @@ from melobot import this_dir
 from melobot import User
 
 
-with open(this_dir("./settings.toml"), encoding="utf-8") as fp:
+settings_path = this_dir("./settings.toml")
+with open(settings_path, encoding="utf-8") as fp:
     SETTINGS = toml.load(fp)
 
 CONFIG = SETTINGS['bot_config']
@@ -37,6 +38,7 @@ PASER_GEN = CmdParserGen(BOT_INFO.uni_cmd_start, BOT_INFO.uni_cmd_sep)
 
 OWNER_CHECKER = CHECKER_GEN.gen_group(User.OWNER) | CHECKER_GEN.gen_private(User.OWNER)
 SU_CHECKER = CHECKER_GEN.gen_group(User.SU) | CHECKER_GEN.gen_private(User.SU)
+WHITE_CHECKER = CHECKER_GEN.gen_group(User.WHITE) | CHECKER_GEN.gen_private(User.WHITE)
 COMMON_CHECKER = CHECKER_GEN.gen_group() | CHECKER_GEN.gen_private()
 
 def get_headers():

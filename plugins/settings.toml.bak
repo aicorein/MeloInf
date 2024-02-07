@@ -2,17 +2,17 @@
 bot_proj_name = "MeloInf"
 bot_proj_ver = "1.0.0a1"
 bot_proj_src = "https://github.com/AiCorein/MeloInf"
-bot_name = "律汐"
-bot_nickname = "小汐"
+bot_name = "meloinf"
+bot_nickname = "meloinf"
 uni_cmd_start = ["*"]
 uni_cmd_sep = [' ']
 uni_default_flag = '/'
-owner = 1574260633
+owner = xxxxxxxx
 super_users = []
 white_users = []
-black_users = [2839922071]
-# white_groups = [174720233, 734106713, 641742677, 164191020, 126881790, 639998612, 927471436, 174720233, 836613453, 534196205]
-white_groups = [174720233]
+black_users = []
+white_groups = []
+# white_groups = []
 
 [request_headers]
 User-Agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'

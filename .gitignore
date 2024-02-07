@@ -2,3 +2,6 @@ logs
 */logs
 __pycache__
 */__pycache__
+
+plugins/word_lib/words.txt
+plugins/settings.toml

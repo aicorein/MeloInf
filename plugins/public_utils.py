@@ -1,17 +1,22 @@
 import aiohttp
 import base64
 import re
-import string
 from typing import Literal, AsyncGenerator
 from contextlib import asynccontextmanager
 
 
-ENG_PUNC = string.punctuation
-HANS_PUNC = '。，、；：？！…—·ˉ¨‘’“”々～‖∶＂＇｀｜〃〔〕〈〉《》「」『』．〖〗【】（）［］｛｝'  
+ENG_PUNC = r"""!"#$%&',.:;?@\^"""
+WITHOUT_DOLLAR_ENG_PUNC = r"""!"#%&',.:;?@\^"""
+HANS_PUNC = '。，、；：？！…—·ˉ¨‘’“”々～‖∶＂＇｀〃．'  
 
 
 def remove_punctuation(s: str) -> str:
     punc = ENG_PUNC + HANS_PUNC
+    return re.sub(rf'[{re.escape(punc)}]', '', s)
+
+
+def remove_ask_punctuation(s: str) -> str:
+    punc = WITHOUT_DOLLAR_ENG_PUNC + HANS_PUNC
     return re.sub(rf'[{re.escape(punc)}]', '', s)
 
 
