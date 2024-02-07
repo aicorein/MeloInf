@@ -35,7 +35,11 @@ class RandomPicGen(Plugin):
                     RandomPicGen.LOGGER.error(f"请求失败：{resp.status}")
                     return
                 try:
-                    code = base64_encode(await resp.read())
+                    data = await resp.read()
+                    code = base64_encode(data)
+                    # path = str(self.ROOT.joinpath(f"{get_id()}.jpg"))
+                    # with open(path, 'wb') as fp:
+                    #     fp.write(data)
                     await send(image_msg(code), wait=True)
                 except Exception as e:
                     await send_reply("图片获取失败...请稍后再试，或联系 bot 管理员解决")

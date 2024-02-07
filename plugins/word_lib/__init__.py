@@ -21,17 +21,17 @@ teach = Plugin.on_message(checker=WHITE_CHECKER,
                                                Format(verify=lambda x: len(x) <= 20 and '##' not in x,
                                                       src_desc="触发语句",
                                                       src_expect="字符数 <= 20 且不包含 ## 符号"),
-                                               Format(verify=lambda x: len(x) <= 40 and '##' not in x,
+                                               Format(verify=lambda x: len(x) <= 200 and '##' not in x,
                                                       src_desc="触发语句",
-                                                      src_expect="字符数 <= 40 且不包含 ## 符号")
+                                                      src_expect="字符数 <= 200 且不包含 ## 符号")
                                            ]))
 
 
-class WordLibLoader(Plugin):
+class WordlibLoader(Plugin):
     def __init__(self) -> None:
         super().__init__()
         self.bot_id = Store.get('BaseUtils', 'bot_id')
-        self.reply_prob = 0.99
+        self.special_prob = 0.001
         self.teach_lock = aio.Lock()
 
     def get_keys(self) -> List[str]:
@@ -47,23 +47,23 @@ class WordLibLoader(Plugin):
         return [text]
     
     def get_random_reply(self, keys: List[str]) -> Union[str, None]:
-        if random() <= self.reply_prob:
-            res: List[str] = []
-            for k in keys:
-                v = WORD_DICT.get(k)
-                if v:
-                    res.extend(v)
-            output = choice(res) if len(res) > 0 else ''
-            if BOT_FLAG in output:
-                output = output.replace(BOT_FLAG, BOT_INFO.bot_nickname)
-            if SENDER_FLAG in output:
-                output = output.replace(SENDER_FLAG, f'[CQ:at,qq={session.event.sender.id}] ')
-            if OWNER_FLAG in output:
-                output = output.replace(OWNER_FLAG, f'[CQ:at,qq={BOT_INFO.owner}] ')
-            return output if len(output) > 0 else None
-        else:
-            output = "[恭喜你触发了这条 1% 概率的隐藏回复]"
-            return output
+        res: List[str] = []
+        for k in keys:
+            v = WORD_DICT.get(k)
+            if v:
+                res.extend(v)
+        output = choice(res) if len(res) > 0 else ''
+        if BOT_FLAG in output:
+            output = output.replace(BOT_FLAG, BOT_INFO.bot_nickname)
+        if SENDER_FLAG in output:
+            output = output.replace(SENDER_FLAG, f'[CQ:at,qq={session.event.sender.id}] ')
+        if OWNER_FLAG in output:
+            output = output.replace(OWNER_FLAG, f'[CQ:at,qq={BOT_INFO.owner}] ')
+        output = output if len(output) > 0 else None
+        if output is not None:
+            if random() < self.special_prob:
+                output = "[恭喜你触发了这条 1% 概率的隐藏回复]"
+        return output
 
     @make_reply
     async def make_reply(self) -> None:

@@ -5,3 +5,4 @@ __pycache__
 
 plugins/word_lib/words.txt
 plugins/settings.toml
+reference.txt
