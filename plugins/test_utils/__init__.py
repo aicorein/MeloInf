@@ -85,4 +85,4 @@ class TestUtils(Plugin):
     @echo
     async def echo(self) -> None:
         content = session.args.vals.pop(0)
-        await send(content)
+        await send(content, enable_cq=True)

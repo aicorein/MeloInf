@@ -27,6 +27,7 @@ class BotInfo:
         self.white_users: List[int] = CONFIG['white_users']
         self.black_users: List[int] = CONFIG['black_users']
         self.white_groups: List[int] = CONFIG['white_groups']
+        self.weather_key: str = CONFIG['weather_key']
 BOT_INFO = BotInfo()
 
 CHECKER_GEN = MsgCheckerGen(owner=BOT_INFO.owner,

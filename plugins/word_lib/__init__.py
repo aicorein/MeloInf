@@ -62,7 +62,7 @@ class WordlibLoader(Plugin):
         output = output if len(output) > 0 else None
         if output is not None:
             if random() < self.special_prob:
-                output = "[恭喜你触发了这条 1% 概率的隐藏回复]"
+                output = "[恭喜你触发了这条千分之一概率的隐藏回复]"
         return output
 
     @make_reply
@@ -70,7 +70,7 @@ class WordlibLoader(Plugin):
         keys = self.get_keys()
         output = self.get_random_reply(keys)
         if output:
-            await send(output, enable_cq_str=True)
+            await send(output, enable_cq=True)
 
     @words_info
     async def words_info(self) -> None:
