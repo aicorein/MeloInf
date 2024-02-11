@@ -6,15 +6,15 @@ from melobot import reply_msg, text_msg
 from melobot import BotHupTimeout
 from ..env import SU_CHECKER, PASER_GEN
 
-atest = Plugin.on_message(parser=PASER_GEN.gen(["异步测试", "atest", "async-test"]), checker=SU_CHECKER)
-stest = Plugin.on_message(checker=SU_CHECKER,
+atest = Plugin.on_msg(parser=PASER_GEN.gen(["异步测试", "atest", "async-test"]), checker=SU_CHECKER)
+stest = Plugin.on_msg(checker=SU_CHECKER,
                           session_rule=AttrRule("sender", "id"),
                           direct_rouse=True,
                           conflict_callback=send("其他的 session 测试进行中...稍后再试"),
                           parser=PASER_GEN.gen(["会话测试", "stest", "session-test"]))
-test_n = Plugin.on_message(parser=PASER_GEN.gen(["测试统计", "testn", "test-stat"]),
+test_n = Plugin.on_msg(parser=PASER_GEN.gen(["测试统计", "testn", "test-stat"]),
                            checker=SU_CHECKER)
-echo = Plugin.on_message(checker=SU_CHECKER,
+echo = Plugin.on_msg(checker=SU_CHECKER,
                          parser=PASER_GEN.gen(["复读", "echo"],
                                               formatters=[
                                                   Format(verify=lambda x: len(x) <= 100,

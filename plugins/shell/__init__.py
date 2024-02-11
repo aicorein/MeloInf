@@ -13,7 +13,7 @@ from ..env import OWNER_CHECKER
 
 
 META_INFO = get_metainfo()
-shell = Plugin.on_message(checker=OWNER_CHECKER,
+shell = Plugin.on_msg(checker=OWNER_CHECKER,
                           session_rule=AttrRule('sender', 'id'),
                           direct_rouse=True,
                           conflict_callback=send("已在运行交互式 shell"),

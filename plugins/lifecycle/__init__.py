@@ -11,10 +11,10 @@ from .recovery import read_rec, save_rec
 
 META_INFO = get_metainfo()
 BOT_NICKNAME = BOT_INFO.bot_nickname
-info = Plugin.on_message(parser=PASER_GEN.gen(["info", "信息"]), checker=COMMON_CHECKER)
-auth = Plugin.on_message(parser=PASER_GEN.gen(["auth", "权限"]), checker=COMMON_CHECKER)
-status = Plugin.on_message(parser=PASER_GEN.gen(["status", "状态"]), checker=COMMON_CHECKER)
-life = Plugin.on_message(checker=OWNER_CHECKER, 
+info = Plugin.on_msg(parser=PASER_GEN.gen(["info", "信息"]), checker=COMMON_CHECKER)
+auth = Plugin.on_msg(parser=PASER_GEN.gen(["auth", "权限"]), checker=COMMON_CHECKER)
+status = Plugin.on_msg(parser=PASER_GEN.gen(["status", "状态"]), checker=COMMON_CHECKER)
+life = Plugin.on_msg(checker=OWNER_CHECKER, 
                          session_rule=AttrRule('sender', 'id'),
                          conflict_callback=send("工作状态切换中...稍后再试~"),
                          priority=PriorityLevel.MIN,

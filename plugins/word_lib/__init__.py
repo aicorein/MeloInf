@@ -10,10 +10,10 @@ from ..public_utils import remove_punctuation, remove_ask_punctuation
 from .dict import WORD_DICT, BOT_FLAG, SENDER_FLAG, OWNER_FLAG, add_pair
 
 
-make_reply = Plugin.on_any_message(checker=COMMON_CHECKER)
-words_info = Plugin.on_message(checker=COMMON_CHECKER,
+make_reply = Plugin.on_any_msg(checker=COMMON_CHECKER)
+words_info = Plugin.on_msg(checker=COMMON_CHECKER,
                                parser=PASER_GEN.gen(["w-info", "词库信息"]))
-teach = Plugin.on_message(checker=WHITE_CHECKER,
+teach = Plugin.on_msg(checker=WHITE_CHECKER,
                           parser=CmdParser(cmd_start='*', 
                                            cmd_sep='##', 
                                            target=["w-teach", "词条扩充"],

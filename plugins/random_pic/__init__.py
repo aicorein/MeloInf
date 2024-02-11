@@ -8,7 +8,7 @@ from ..env import PASER_GEN, COMMON_CHECKER, get_headers
 from ..public_utils import base64_encode, async_http
 
 
-rpic = Plugin.on_message(parser=PASER_GEN.gen(['随机图', 'rpic']), checker=COMMON_CHECKER)
+rpic = Plugin.on_msg(parser=PASER_GEN.gen(['随机图', 'rpic']), checker=COMMON_CHECKER)
 
 
 class RandomPicGen(Plugin):

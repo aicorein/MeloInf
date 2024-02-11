@@ -6,7 +6,7 @@ from ..env import COMMON_CHECKER, PASER_GEN
 from .gen import Generator
 
 
-bullshit_gen = Plugin.on_message(checker=COMMON_CHECKER,
+bullshit_gen = Plugin.on_msg(checker=COMMON_CHECKER,
                                  parser=PASER_GEN.gen(["狗屁不通生成", "bullshit"],
                                                       formatters=[
                                                           Format(verify=lambda x: len(x) <= 15,

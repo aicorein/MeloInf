@@ -8,7 +8,7 @@ from melobot import send, this_dir, clear_cq
 from ..env import COMMON_CHECKER, PASER_GEN
 
 
-be_ill = Plugin.on_message(checker=COMMON_CHECKER,
+be_ill = Plugin.on_msg(checker=COMMON_CHECKER,
                            parser=PASER_GEN.gen(["发病", "ill"],
                                                 formatters=[
                                                     Format(verify=lambda x: len(x) <= 20,

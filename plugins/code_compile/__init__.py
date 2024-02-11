@@ -1,12 +1,13 @@
 from melobot import Plugin, send_reply, session
 from melobot import ArgFormatter as Format
-from melobot import CmdParser
+from melobot import CmdParser, PluginBus
+from typing import Dict
 
 from ..env import COMMON_CHECKER, get_headers, BOT_INFO
 from ..public_utils import async_http
 
 
-code_c = Plugin.on_message(checker=COMMON_CHECKER, parser=CmdParser(
+code_c = Plugin.on_msg(checker=COMMON_CHECKER, parser=CmdParser(
     cmd_start='*',
     cmd_sep='$',
     target=["code", "代码"],
@@ -26,24 +27,27 @@ code_c = Plugin.on_message(checker=COMMON_CHECKER, parser=CmdParser(
 class CodeCompiler(Plugin):
     def __init__(self) -> None:
         super().__init__()
-    
-    @code_c
-    async def codec(self) -> None:
-        lang, code = session.args.vals
-        match lang:
-            case "cpp": lang_id, ext = 7, "cpp"
-            case "cs": lang_id, ext = 10, "cs"
-            case "py": lang_id, ext = 15, "py3"
-        url = 'https://www.runoob.com/try/compile2.php'
+        self.url = 'https://www.runoob.com/try/compile2.php'
+
+    @PluginBus.on("CodeCompiler", 'do_calc')
+    async def do_calc(self, expression: str, lang_id: int, ext: str) -> str:
+        code = f"print(eval('{expression}'))"
+        output = await self.compile(code, lang_id, ext)
+        return output
+
+    def gen_headers(self) -> Dict:
         headers = get_headers()
         headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
+        return headers
+
+    async def compile(self, code: str, lang_id: int, ext: str) -> str:
         data = {
             'code': code,
             'token': '066417defb80d038228de76ec581a50a',
             'language': lang_id,
             'fileext': ext,
         }
-        async with async_http(url, 'post', headers=headers, data=data) as resp:
+        async with async_http(self.url, 'post', headers=self.gen_headers(), data=data) as resp:
             if resp.status != 200:
                 await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
                 CodeCompiler.LOGGER.error(f"请求失败：{resp.status}")
@@ -54,7 +58,17 @@ class CodeCompiler(Plugin):
                     output = ret['errors'].strip('\n')
                 else:
                     output = ret['output'].strip('\n')
-                await send_reply(output)
+                return output
             except Exception as e:
                 await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
                 CodeCompiler.LOGGER.error(f"{e.__class__.__name__} {e}")
+
+    @code_c
+    async def codec(self) -> None:
+        lang, code = session.args.vals
+        match lang:
+            case "cpp": lang_id, ext = 7, "cpp"
+            case "cs": lang_id, ext = 10, "cs"
+            case "py": lang_id, ext = 15, "py3"
+        output = await self.compile(code, lang_id, ext)
+        await send_reply(output)

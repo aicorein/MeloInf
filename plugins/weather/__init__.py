@@ -7,7 +7,7 @@ from ..env import COMMON_CHECKER, PASER_GEN, BOT_INFO, get_headers
 from ..public_utils import async_http
 
 
-weather = Plugin.on_message(checker=COMMON_CHECKER,
+weather = Plugin.on_msg(checker=COMMON_CHECKER,
                             parser=PASER_GEN.gen(["天气", "weather"],
                                                  formatters=[
                                                      Format(verify=lambda x: len(x) <= 10,
