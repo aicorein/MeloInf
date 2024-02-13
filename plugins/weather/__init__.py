@@ -1,10 +1,12 @@
 import asyncio as aio
+import matplotlib.pyplot as plt 
 from melobot import Plugin, session
 from melobot import ArgFormatter as Format
-from melobot import send, send_reply, finish
+from melobot import send, send_reply, finish, image_msg
 
 from ..env import COMMON_CHECKER, PASER_GEN, BOT_INFO, get_headers
 from ..public_utils import async_http
+from .make_fig import gen_weather_fig
 
 
 weather = Plugin.on_msg(checker=COMMON_CHECKER,
@@ -34,6 +36,7 @@ class WeatherUtils(Plugin):
     async def weather(self) -> None:
         city, days = session.args.vals
         text_box = []
+        min_temps, max_temps = [], []
         async with self.lock:
             async with async_http(self.city_lookup_url, 'get', headers=get_headers(),
                                   params={'location': city, 'key': self.api_key}) as resp:
@@ -65,8 +68,12 @@ class WeatherUtils(Plugin):
                 res = await resp.json()
             
             for data in res['daily']:
-                text_box.append(' ● ' + data['textDay'] + ' ' + data['tempMin']+' ~ '+data['tempMax']+' 度')
-            output = f'城市 {city}：\n【今日天气】{text_box[0]}\n【未来 {days} 天天气】\n'
+                text_box.append(' ● ' + data['textDay'] + ' ' + data['tempMin']+' ~ '+ data['tempMax']+' 度')
+                min_temps.append(int(data['tempMin']))
+                max_temps.append(int(data['tempMax']))
+            output = f'城市 {city}：\n【今日天气】{text_box[0]}\n【近 {days} 天天气（包括今天）】\n'
             output += '\n'.join(text_box[1: days+1])
             output += f'\n【详细参见】{link}'
             await send(output)
+            fig_b64 = gen_weather_fig(min_temps[:days], max_temps[:days])
+            await send(image_msg(fig_b64), wait=True)

@@ -13,7 +13,7 @@ calc = Plugin.on_msg(checker=COMMON_CHECKER,
                      formatters=[
                          Format(verify=lambda x: len(x) <= 50,
                                 src_desc="用于计算的表达式",
-                                rc_expect="表达式字符数 <= 50")
+                                src_expect="表达式字符数 <= 50")
                      ]))
 
 
