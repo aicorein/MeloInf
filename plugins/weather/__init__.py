@@ -4,23 +4,24 @@ from melobot import Plugin, session
 from melobot import ArgFormatter as Format
 from melobot import send, send_reply, finish, image_msg
 
-from ..env import COMMON_CHECKER, PASER_GEN, BOT_INFO, get_headers
+from ..env import COMMON_CHECKER, PARSER_GEN, BOT_INFO, get_headers
 from ..public_utils import async_http
 from .make_fig import gen_weather_fig
 
 
-weather = Plugin.on_msg(checker=COMMON_CHECKER,
-                            parser=PASER_GEN.gen(["天气", "weather"],
-                                                 formatters=[
-                                                     Format(verify=lambda x: len(x) <= 10,
-                                                            src_desc="城市名",
-                                                            src_expect="字符数 <= 10"),
-                                                     Format(convert=int,
-                                                            verify=lambda x: 1<=x<=7,
-                                                            src_desc="需要预报的天数",
-                                                            src_expect="1<=天数<=7",
-                                                            default=3)
-                                                 ]))
+weather = Plugin.on_msg(checker=COMMON_CHECKER, parser=PARSER_GEN.gen(
+    target=["天气", "weather"],
+    formatters=[
+        Format(verify=lambda x: len(x) <= 10,
+               src_desc="城市名",
+               src_expect="字符数 <= 10"),
+        Format(convert=int,
+               verify=lambda x: 1<=x<=7,
+               src_desc="需要预报的天数",
+               src_expect="1<=天数<=7",
+               default=3)
+    ]
+))
 
 
 class WeatherUtils(Plugin):
@@ -47,8 +48,8 @@ class WeatherUtils(Plugin):
                 else:
                     res = await resp.json()
             
-            if res['code'] == '404':
-                finish( f'检索不到城市 {city}，请检查输入哦~')
+            if res['code'] == '404' or 'location' not in res.keys():
+                await finish( f'检索不到城市 {city}，请检查输入哦~')
             link = res['location'][0]['fxLink']
             city_id = res['location'][0]['id']
         

@@ -5,16 +5,16 @@ from melobot import send_reply
 from ..env import COMMON_CHECKER
 
 
-calc = Plugin.on_msg(checker=COMMON_CHECKER,
-                     parser=CmdParser(
-                     cmd_start=['~', '～'],
-                     cmd_sep=' ',
-                     target=["计算", "calc"],
-                     formatters=[
-                         Format(verify=lambda x: len(x) <= 50,
-                                src_desc="用于计算的表达式",
-                                src_expect="表达式字符数 <= 50")
-                     ]))
+calc = Plugin.on_msg(checker=COMMON_CHECKER, parser=CmdParser(
+    cmd_start=['~', '～'],
+    cmd_sep=' ',
+    target=["计算", "calc"],
+    formatters=[
+        Format(verify=lambda x: len(x) <= 50,
+               src_desc="用于计算的表达式",
+               src_expect="表达式字符数 <= 50")
+    ]
+))
 
 
 class Calculator(Plugin):

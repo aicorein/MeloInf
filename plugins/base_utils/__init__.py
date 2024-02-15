@@ -1,4 +1,10 @@
-from melobot import Plugin, bot, BotLife, session
+import io
+from melobot import Plugin, bot, BotLife, session, PluginBus
+from typing import Tuple
+from PIL import Image
+from melobot import text_msg
+
+from .utils import txt2img, wrap_s
 
 
 class BaseUtils(Plugin):
@@ -8,6 +14,20 @@ class BaseUtils(Plugin):
         super().__init__()
         self.bot_name = None
         self.bot_id = None
+
+    @PluginBus.on("BaseUtils", "txt2img")
+    async def _txt2img(self, s: str, wrap_len: int=70, font_size: int=18, bg_color: str="white", 
+                       color: str="black", margin: Tuple[int, int]=[10, 10], ) -> bytes:
+        text = '\n'.join(wrap_s(s, wrap_len))
+        img = txt2img(text, font_size, bg_color, color, margin)
+        imgio = io.BytesIO()
+        img.save(imgio, format='JPEG', quality=95)
+        return imgio.getvalue()
+    
+    @PluginBus.on("BaseUtils", "txt2msgs")
+    async def txt2msgs(self, s: str, one_msg_len: int=200):
+        txt_list = wrap_s(s, one_msg_len)
+        return [text_msg(txt) for txt in txt_list]
 
     @bot.on(BotLife.CONNECTED)
     async def get_login_info(self) -> None:

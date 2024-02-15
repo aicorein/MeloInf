@@ -5,25 +5,27 @@ from melobot import Plugin, send, send_reply, get_metainfo
 from melobot import ArgFormatter as Format, AttrSessionRule as AttrRule
 from melobot import User, BotLife, bot, session, PriorityLevel
 
-from ..env import PASER_GEN, COMMON_CHECKER, BOT_INFO, CHECKER_GEN, OWNER_CHECKER
+from ..env import PARSER_GEN, COMMON_CHECKER, BOT_INFO, CHECKER_GEN, OWNER_CHECKER
 from .recovery import read_rec, save_rec
 
 
 META_INFO = get_metainfo()
 BOT_NICKNAME = BOT_INFO.bot_nickname
-info = Plugin.on_msg(parser=PASER_GEN.gen(["info", "信息"]), checker=COMMON_CHECKER)
-auth = Plugin.on_msg(parser=PASER_GEN.gen(["auth", "权限"]), checker=COMMON_CHECKER)
-status = Plugin.on_msg(parser=PASER_GEN.gen(["status", "状态"]), checker=COMMON_CHECKER)
+info = Plugin.on_msg(parser=PARSER_GEN.gen(target=["info", "信息"]), checker=COMMON_CHECKER)
+auth = Plugin.on_msg(parser=PARSER_GEN.gen(target=["auth", "权限"]), checker=COMMON_CHECKER)
+status = Plugin.on_msg(parser=PARSER_GEN.gen(target=["status", "状态"]), checker=COMMON_CHECKER)
 life = Plugin.on_msg(checker=OWNER_CHECKER, 
-                         session_rule=AttrRule('sender', 'id'),
-                         conflict_callback=send("工作状态切换中...稍后再试~"),
-                         priority=PriorityLevel.MIN,
-                         parser=PASER_GEN.gen(["life", "状态设置"], 
-                                              formatters=[
-                                                  Format(verify=lambda x: x in ['on', 'off', 'stop', 'restart', 're'],
-                                                         src_desc="工作状态变更选项",
-                                                         src_expect="以下值之一：['on', 'off', 'stop', 'restart', 're']")
-                                              ]))
+                     session_rule=AttrRule('sender', 'id'),
+                     conflict_callback=send("工作状态切换中...稍后再试~"),
+                     priority=PriorityLevel.MIN, 
+                     parser=PARSER_GEN.gen(
+                         target=["life", "状态设置"],
+                         formatters=[
+                             Format(verify=lambda x: x in ['on', 'off', 'stop', 'restart', 're'],
+                                    src_desc="工作状态变更选项",
+                                    src_expect="以下值之一：['on', 'off', 'stop', 'restart', 're']")
+                         ]
+                     ))
 
 
 class LifeCycleUtils(Plugin):

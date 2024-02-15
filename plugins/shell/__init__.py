@@ -1,30 +1,31 @@
 import time
 import subprocess
-import signal
 import psutil
 import asyncio as aio
 from typing import Tuple, Union, List
 
-from melobot import Plugin, bot, BotLife, session
+from melobot import Plugin, bot, BotLife, session, PluginBus
 from melobot import ArgFormatter as Format, AttrSessionRule as AttrRule, CmdParser
-from melobot import send, finish, get_metainfo
+from melobot import send, finish, get_metainfo, image_msg
 
 from ..env import OWNER_CHECKER
-
+from ..public_utils import base64_encode
 
 META_INFO = get_metainfo()
 shell = Plugin.on_msg(checker=OWNER_CHECKER,
-                          session_rule=AttrRule('sender', 'id'),
-                          direct_rouse=True,
-                          conflict_callback=send("已在运行交互式 shell"),
-                          parser=CmdParser(cmd_start='*',
-                                           cmd_sep='$$',
-                                           target=["shell"], 
-                                           formatters=[
-                                               Format(src_desc="命令内容",
-                                                      src_expect="字符串",
-                                                      default=None)
-                                           ]))
+                      session_rule=AttrRule('sender', 'id'),
+                      direct_rouse=True,
+                      conflict_callback=send("已在运行交互式 shell"),
+                      parser=CmdParser(
+                          cmd_start='*',
+                          cmd_sep='$$',
+                          target="shell", 
+                          formatters=[
+                              Format(src_desc="命令内容",
+                                     src_expect="字符串",
+                                     default=None)
+                          ]
+                      ))
 
 
 class ShellManager(Plugin):
@@ -93,7 +94,13 @@ class ShellManager(Plugin):
                         continue
                     if self.pointer:
                         p = self.pointer
-                        await session.custom_send(s, p[1], p[0], p[2])
+                        if len(s) > 200:
+                            data = await PluginBus.emit("BaseUtils", "txt2img", s, wait=True)
+                            b64_data = base64_encode(data)
+                            msg = image_msg(b64_data)
+                        else:
+                            msg = s
+                        await session.custom_send(msg, p[1], p[0], p[2])
                 await aio.sleep(0.2)
         except aio.CancelledError:
             pass

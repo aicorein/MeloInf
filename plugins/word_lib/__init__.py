@@ -5,26 +5,27 @@ from melobot import send, send_reply
 from random import random, choice
 from typing import List, Union
 
-from ..env import COMMON_CHECKER, BOT_INFO, PASER_GEN, WHITE_CHECKER
+from ..env import COMMON_CHECKER, BOT_INFO, PARSER_GEN, WHITE_CHECKER
 from ..public_utils import remove_punctuation, remove_ask_punctuation
 from .dict import WORD_DICT, BOT_FLAG, SENDER_FLAG, OWNER_FLAG, add_pair
 
 
 make_reply = Plugin.on_any_msg(checker=COMMON_CHECKER)
-words_info = Plugin.on_msg(checker=COMMON_CHECKER,
-                               parser=PASER_GEN.gen(["w-info", "词库信息"]))
+words_info = Plugin.on_msg(checker=COMMON_CHECKER, parser=PARSER_GEN.gen(["w-info", "词库信息"]))
 teach = Plugin.on_msg(checker=WHITE_CHECKER,
-                          parser=CmdParser(cmd_start='*', 
-                                           cmd_sep='##', 
-                                           target=["w-teach", "词条扩充"],
-                                           formatters=[
-                                               Format(verify=lambda x: len(x) <= 20 and '##' not in x,
-                                                      src_desc="触发语句",
-                                                      src_expect="字符数 <= 20 且不包含 ## 符号"),
-                                               Format(verify=lambda x: len(x) <= 200 and '##' not in x,
-                                                      src_desc="触发语句",
-                                                      src_expect="字符数 <= 200 且不包含 ## 符号")
-                                           ]))
+                      parser=CmdParser(
+                          cmd_start='*', 
+                          cmd_sep='##', 
+                          target=["w-teach", "词条扩充"],
+                          formatters=[
+                              Format(verify=lambda x: len(x) <= 20 and '##' not in x,
+                                     src_desc="触发语句",
+                                     src_expect="字符数 <= 20 且不包含 ## 符号"),
+                              Format(verify=lambda x: len(x) <= 200 and '##' not in x,
+                                     src_desc="触发语句",
+                                     src_expect="字符数 <= 200 且不包含 ## 符号")
+                          ]
+                      ))
 
 
 class WordlibLoader(Plugin):

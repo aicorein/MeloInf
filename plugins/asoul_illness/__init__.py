@@ -5,16 +5,17 @@ from melobot import Plugin, session
 from melobot import ArgFormatter as Format
 from melobot import send, this_dir, clear_cq
 
-from ..env import COMMON_CHECKER, PASER_GEN
+from ..env import COMMON_CHECKER, PARSER_GEN
 
 
-be_ill = Plugin.on_msg(checker=COMMON_CHECKER,
-                           parser=PASER_GEN.gen(["发病", "ill"],
-                                                formatters=[
-                                                    Format(verify=lambda x: len(x) <= 20,
-                                                           src_desc="发病对象",
-                                                           src_expect="字符数 <= 20")
-                                                ]))
+be_ill = Plugin.on_msg(checker=COMMON_CHECKER, parser=PARSER_GEN.gen(
+    target=["发病", "ill"],
+    formatters=[
+        Format(verify=lambda x: len(x) <= 20,
+               src_desc="发病对象",
+               src_expect="字符数 <= 20")
+    ]
+))
 
 
 data_path = this_dir("data.json")

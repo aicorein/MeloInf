@@ -1,6 +1,6 @@
 import toml
 from copy import deepcopy
-from typing import Union, List
+from typing import Union, List, Tuple
 
 from melobot import MsgCheckerGen, CmdParserGen
 from melobot import this_dir
@@ -29,6 +29,8 @@ class BotInfo:
         self.white_groups: List[int] = CONFIG['white_groups']
         self.figure_font: str = CONFIG['figure_font']
         self.weather_key: str = CONFIG['weather_key']
+        self.dice_base_r: Tuple[int, int] = tuple(CONFIG['dice_base_r'])
+        self.txt2img_font: str = CONFIG['txt2img_font']
 BOT_INFO = BotInfo()
 
 CHECKER_GEN = MsgCheckerGen(owner=BOT_INFO.owner,
@@ -36,7 +38,7 @@ CHECKER_GEN = MsgCheckerGen(owner=BOT_INFO.owner,
                             white_users=BOT_INFO.white_users,
                             black_users=BOT_INFO.black_users,
                             white_groups=BOT_INFO.white_groups)
-PASER_GEN = CmdParserGen(BOT_INFO.uni_cmd_start, BOT_INFO.uni_cmd_sep)
+PARSER_GEN = CmdParserGen(BOT_INFO.uni_cmd_start, BOT_INFO.uni_cmd_sep)
 
 OWNER_CHECKER = CHECKER_GEN.gen_group(User.OWNER) | CHECKER_GEN.gen_private(User.OWNER)
 SU_CHECKER = CHECKER_GEN.gen_group(User.SU) | CHECKER_GEN.gen_private(User.SU)

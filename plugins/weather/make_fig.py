@@ -1,4 +1,5 @@
 import os
+import io
 import matplotlib.pyplot as plt
 from random import choice
 from PIL import Image
@@ -39,8 +40,8 @@ def gen_weather_fig(min_temps: List[int], max_temps: List[int]) -> str:
     lower_v, upper_v, steps = -100, 100, 4
     day_s, day_e = 1, data_len
     fig = plt.figure(num=fig_id, figsize=(6.4, 5))
-    fig_path = os.path.join(cwd, str(get_id())+'.png')
-    fig_final_path = os.path.join(cwd, str(get_id())+'.jpg')
+    figio = io.BytesIO()
+    imgio = io.BytesIO()
     ax = fig.gca()
 
     ax.set_xticks(range(day_s, day_e+1))
@@ -52,15 +53,12 @@ def gen_weather_fig(min_temps: List[int], max_temps: List[int]) -> str:
     ax.plot(range(1, data_len+1), min_temps, marker='*', color="deepskyblue")
     ax.plot(range(1, data_len+1), max_temps, marker='*', color="deeppink")
     ax.grid(True, axis='y', linestyle='--')
-    fig.savefig(fig_path, dpi=150)
+    fig.savefig(figio, dpi=150)
     fig.clf()
 
-    im1 = Image.open(fig_path)
+    im1 = Image.open(figio)
     im2 = choice(bg_images).convert("RGBA").crop((0, 0, 960, 750))
     im3 = Image.blend(im2, im1, 0.82)
-    im3.convert("RGB").save(fig_final_path, quality=95)
-    with open(fig_final_path, 'rb') as fp:
-        fig_b64 = base64_encode(fp.read())
-    os.remove(fig_path)
-    os.remove(fig_final_path)
+    im3.convert("RGB").save(imgio, format='JPEG', quality=95)
+    fig_b64 = base64_encode(imgio.getvalue())
     return fig_b64
