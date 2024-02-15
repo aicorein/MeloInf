@@ -9,13 +9,15 @@ from melobot import this_dir
 from ..env import BOT_INFO
 
 
-r_regex = re.compile(r'(\d*d\d*)')
+r_regex = re.compile(r"(\d*d\d*)")
+
+
 def r_gen(string: str) -> str:
-    ns = string.lower().replace('x', '*')
+    ns = string.lower().replace("x", "*")
     ss = r_regex.split(ns)
     for i in range(1, len(ss), 2):
-        a, b = ss[i].split('d')
-        if a == '' and b == '':
+        a, b = ss[i].split("d")
+        if a == "" and b == "":
             a, b = BOT_INFO.dice_base_r
         else:
             a, b = int(a), int(b)
@@ -23,13 +25,15 @@ def r_gen(string: str) -> str:
         for j in range(a):
             res += random.randint(1, b)
         ss[i] = str(res)
-    return str(int(eval(''.join(ss))))
+    return str(int(eval("".join(ss))))
 
 
 class DeckItem:
 
     class DrawRecords:
-        def __init__(self, deck_name: str, sample_num: int, replace: bool, pos: List[int]) -> None:
+        def __init__(
+            self, deck_name: str, sample_num: int, replace: bool, pos: List[int]
+        ) -> None:
             self.deck_name = deck_name
             self.sample_num = sample_num
             self.replace = replace
@@ -37,26 +41,26 @@ class DeckItem:
             self.res: str = None
 
     def __init__(self, raw: str, group_name: str) -> None:
-        self._deck_regex = re.compile(r'\{(.+?)\}')
-        self._var_regex = re.compile(r'\[(.+?)\]')
-        self._freq_regex = re.compile(r'^::(\d+)::')
+        self._deck_regex = re.compile(r"\{(.+?)\}")
+        self._var_regex = re.compile(r"\[(.+?)\]")
+        self._freq_regex = re.compile(r"^::(\d+)::")
 
         res = self._freq_regex.search(raw)
         self.freq = int(res.group(1)) if res is not None else 1
-        self.exp = self._freq_regex.sub('', raw)
+        self.exp = self._freq_regex.sub("", raw)
         self.namespace = group_name
 
     def format(self) -> str:
         ss = self._var_regex.split(self.exp)
         for i in range(1, len(ss), 2):
             ss[i] = r_gen(ss[i])
-        ss = ''.join(ss)
-        
+        ss = "".join(ss)
+
         ss = self._deck_regex.split(ss)
         draw_recs: Dict[str, DeckItem.DrawRecords] = {}
         for i in range(1, len(ss), 2):
             replace = True
-            if ss[i][0] == '%':
+            if ss[i][0] == "%":
                 replace = False
                 ss[i] = ss[i][1:]
             rec = draw_recs.get(ss[i])
@@ -69,7 +73,7 @@ class DeckItem:
                 rec.pos.append(i)
                 if replace == False:
                     rec.replace = False
-        
+
         for rec in draw_recs.values():
             cur_group = DeckStore.get(self.namespace)
             deck = cur_group.decks[rec.deck_name]
@@ -77,8 +81,8 @@ class DeckItem:
         for rec in draw_recs.values():
             for i, j in enumerate(rec.pos):
                 ss[j] = rec.res[i]
-        
-        return ''.join(ss)
+
+        return "".join(ss)
 
 
 class Deck:
@@ -87,7 +91,7 @@ class Deck:
         self.name = deck_name
         self.freqs = [item.freq for item in items]
 
-    def draw(self, sample_num: int=1, replace: bool=False) -> List[str]:
+    def draw(self, sample_num: int = 1, replace: bool = False) -> List[str]:
         if replace:
             samples = random.choices(self._items, self.freqs, k=sample_num)
         else:
@@ -115,26 +119,28 @@ class DeckStore:
     @classmethod
     def get(cls, group_name: str) -> DeckGroup | None:
         return cls.__store__.get(group_name)
-    
+
     @classmethod
     def get_all(cls) -> Dict[str, DeckGroup]:
         return cls.__store__
-    
+
     @classmethod
     def add(cls, group_name: str, group: DeckGroup) -> None:
         res = cls.__store__.get(group_name)
         if res is not None:
-            raise ValueError(f"名为 {group_name} 的牌堆组已存在，请更改对应文件名以避免重名")
+            raise ValueError(
+                f"名为 {group_name} 的牌堆组已存在，请更改对应文件名以避免重名"
+            )
         cls.__store__[group_name] = group
 
 
 cwd = this_dir()
-deck_dir = os.path.join(cwd, 'decks')
-with open(this_dir('decks_cmd.toml'), encoding='utf-8') as fp:
+deck_dir = os.path.join(cwd, "decks")
+with open(this_dir("decks_cmd.toml"), encoding="utf-8") as fp:
     cmd_map = toml.load(fp)
 
 for filename, cmds in cmd_map.items():
-    with open(os.path.join(deck_dir, filename+'.json'), encoding='utf-8') as fp:
+    with open(os.path.join(deck_dir, filename + ".json"), encoding="utf-8") as fp:
         deck_json = json.load(fp)
     for cmd in cmds:
         if cmd not in deck_json.keys():

@@ -3,12 +3,16 @@ from melobot import this_dir
 from typing import Dict, List
 
 
-words_path = this_dir('words.txt') if os.path.exists(this_dir('words.txt')) else this_dir('words.txt.bak')
+words_path = (
+    this_dir("words.txt")
+    if os.path.exists(this_dir("words.txt"))
+    else this_dir("words.txt.bak")
+)
 
 
-with open(words_path, encoding='utf-8') as fp:
+with open(words_path, encoding="utf-8") as fp:
     alist = fp.readlines()
-alist = map(lambda x: x.rstrip('\n').split('##'), alist)
+alist = map(lambda x: x.rstrip("\n").split("##"), alist)
 adict: Dict[str, List[str]] = {}
 for k, v in alist:
     dict_val = adict.get(k)
@@ -19,7 +23,7 @@ for k, v in alist:
 
 
 def save_dict() -> None:
-    with open(words_path, 'w', encoding='utf-8') as fp:
+    with open(words_path, "w", encoding="utf-8") as fp:
         for k, vals in WORD_DICT.items():
             for v in vals:
                 fp.write(f"{k}##{v}\n")
@@ -40,6 +44,6 @@ def add_pair(ask: str, ans: str) -> bool:
 
 
 WORD_DICT = adict
-BOT_FLAG = '$$bot$$'
-SENDER_FLAG = '$$sender$$'
-OWNER_FLAG = '$$owner$$'
+BOT_FLAG = "$$bot$$"
+SENDER_FLAG = "$$sender$$"
+OWNER_FLAG = "$$owner$$"

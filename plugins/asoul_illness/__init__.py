@@ -8,22 +8,28 @@ from melobot import send, this_dir, clear_cq
 from ..env import COMMON_CHECKER, PARSER_GEN
 
 
-be_ill = Plugin.on_msg(checker=COMMON_CHECKER, parser=PARSER_GEN.gen(
-    target=["发病", "ill"],
-    formatters=[
-        Format(verify=lambda x: len(x) <= 20,
-               src_desc="发病对象",
-               src_expect="字符数 <= 20")
-    ]
-))
+be_ill = Plugin.on_msg(
+    checker=COMMON_CHECKER,
+    parser=PARSER_GEN.gen(
+        target=["发病", "ill"],
+        formatters=[
+            Format(
+                verify=lambda x: len(x) <= 20,
+                src_desc="发病对象",
+                src_expect="字符数 <= 20",
+            )
+        ],
+    ),
+)
 
 
 data_path = this_dir("data.json")
 
+
 class AsoulIllness(Plugin):
     def __init__(self) -> None:
         super().__init__()
-        with open(data_path, encoding='utf-8') as fp:
+        with open(data_path, encoding="utf-8") as fp:
             self.data: List[Dict[str, str]] = json.load(fp)
 
     @be_ill

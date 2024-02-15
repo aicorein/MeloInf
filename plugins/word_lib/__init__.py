@@ -11,55 +11,67 @@ from .dict import WORD_DICT, BOT_FLAG, SENDER_FLAG, OWNER_FLAG, add_pair
 
 
 make_reply = Plugin.on_any_msg(checker=COMMON_CHECKER)
-words_info = Plugin.on_msg(checker=COMMON_CHECKER, parser=PARSER_GEN.gen(["w-info", "词库信息"]))
-teach = Plugin.on_msg(checker=WHITE_CHECKER,
-                      parser=CmdParser(
-                          cmd_start='*', 
-                          cmd_sep='##', 
-                          target=["w-teach", "词条扩充"],
-                          formatters=[
-                              Format(verify=lambda x: len(x) <= 20 and '##' not in x,
-                                     src_desc="触发语句",
-                                     src_expect="字符数 <= 20 且不包含 ## 符号"),
-                              Format(verify=lambda x: len(x) <= 200 and '##' not in x,
-                                     src_desc="触发语句",
-                                     src_expect="字符数 <= 200 且不包含 ## 符号")
-                          ]
-                      ))
+words_info = Plugin.on_msg(
+    checker=COMMON_CHECKER, parser=PARSER_GEN.gen(["w-info", "词库信息"])
+)
+teach = Plugin.on_msg(
+    checker=WHITE_CHECKER,
+    parser=CmdParser(
+        cmd_start="*",
+        cmd_sep="##",
+        target=["w-teach", "词条扩充"],
+        formatters=[
+            Format(
+                verify=lambda x: len(x) <= 20 and "##" not in x,
+                src_desc="触发语句",
+                src_expect="字符数 <= 20 且不包含 ## 符号",
+            ),
+            Format(
+                verify=lambda x: len(x) <= 200 and "##" not in x,
+                src_desc="触发语句",
+                src_expect="字符数 <= 200 且不包含 ## 符号",
+            ),
+        ],
+    ),
+)
 
 
 class WordlibLoader(Plugin):
     def __init__(self) -> None:
         super().__init__()
-        self.bot_id = Store.get('BaseUtils', 'bot_id')
+        self.bot_id = Store.get("BaseUtils", "bot_id")
         self.special_prob = 0.001
         self.teach_lock = aio.Lock()
 
     def get_keys(self) -> List[str]:
-        text = session.event.text.replace('\n', '').strip(' ')
+        text = session.event.text.replace("\n", "").strip(" ")
         text = remove_punctuation(text)
-        text = text.replace(BOT_INFO.bot_name, BOT_FLAG).replace(BOT_INFO.bot_nickname, BOT_FLAG)
+        text = text.replace(BOT_INFO.bot_name, BOT_FLAG).replace(
+            BOT_INFO.bot_nickname, BOT_FLAG
+        )
         for item in session.event.content:
-            if item['type'] == 'at' and int(item['data']['qq']) == self.bot_id.val:
+            if item["type"] == "at" and int(item["data"]["qq"]) == self.bot_id.val:
                 keys = []
                 keys.append(f"{BOT_FLAG}{text}")
                 keys.append(f"{text}{BOT_FLAG}")
                 return keys
         return [text]
-    
+
     def get_random_reply(self, keys: List[str]) -> Union[str, None]:
         res: List[str] = []
         for k in keys:
             v = WORD_DICT.get(k)
             if v:
                 res.extend(v)
-        output = choice(res) if len(res) > 0 else ''
+        output = choice(res) if len(res) > 0 else ""
         if BOT_FLAG in output:
             output = output.replace(BOT_FLAG, BOT_INFO.bot_nickname)
         if SENDER_FLAG in output:
-            output = output.replace(SENDER_FLAG, f'[CQ:at,qq={session.event.sender.id}] ')
+            output = output.replace(
+                SENDER_FLAG, f"[CQ:at,qq={session.event.sender.id}] "
+            )
         if OWNER_FLAG in output:
-            output = output.replace(OWNER_FLAG, f'[CQ:at,qq={BOT_INFO.owner}] ')
+            output = output.replace(OWNER_FLAG, f"[CQ:at,qq={BOT_INFO.owner}] ")
         output = output if len(output) > 0 else None
         if output is not None:
             if random() < self.special_prob:
@@ -75,7 +87,7 @@ class WordlibLoader(Plugin):
 
     @words_info
     async def words_info(self) -> None:
-        output = f'● 当前加载词库文件：words.txt\n● 词条数：{len(WORD_DICT)}'
+        output = f"● 当前加载词库文件：words.txt\n● 词条数：{len(WORD_DICT)}"
         await send(output)
 
     @teach
