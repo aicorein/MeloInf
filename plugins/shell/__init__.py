@@ -1,12 +1,24 @@
-import time
-import subprocess
-import psutil
 import asyncio as aio
-from typing import Tuple, Union, List
+import subprocess
+import time
+from typing import List, Tuple, Union
 
-from melobot import Plugin, bot, BotLife, session, PluginBus
-from melobot import ArgFormatter as Format, AttrSessionRule as AttrRule, CmdParser
-from melobot import send, finish, get_metainfo, image_msg
+import psutil
+
+from melobot import ArgFormatter as Format
+from melobot import AttrSessionRule as AttrRule
+from melobot import (
+    BotLife,
+    CmdParser,
+    Plugin,
+    PluginBus,
+    bot,
+    finish,
+    get_metainfo,
+    image_msg,
+    send,
+    session,
+)
 
 from ..env import OWNER_CHECKER
 from ..public_utils import base64_encode
@@ -140,10 +152,12 @@ class ShellManager(Plugin):
                 session.event.is_private(),
                 session.event.group_id,
             )
-            tip = "已进入交互 shell。\n"
-            +"使用 $\\n$ 发送一个回车\n"
-            +"使用 $ctrlc$ 结束其内部程序执行\n"
-            +"使用 $exit$ 退出交互状态"
+            tip = (
+                "已进入交互 shell。\n"
+                + "使用 $\\n$ 发送一个回车\n"
+                + "使用 $ctrlc$ 结束其内部程序执行\n"
+                + "使用 $exit$ 退出交互状态"
+            )
             await send(tip)
             while True:
                 await session.suspend()
