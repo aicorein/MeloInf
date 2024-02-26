@@ -1,9 +1,9 @@
-import aiohttp
 import base64
 import re
-from typing import Literal, AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator, Literal
 
+import aiohttp
 
 ENG_PUNC = r"""!"#$%&',.:;?@\^"""
 WITHOUT_DOLLAR_ENG_PUNC = r"""!"#%&',.:;?@\^"""

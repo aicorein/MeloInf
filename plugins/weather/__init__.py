@@ -1,12 +1,11 @@
 import asyncio as aio
-from melobot import Plugin, session
-from melobot import ArgFormatter as Format
-from melobot import send, send_reply, finish, image_msg
 
-from ..env import COMMON_CHECKER, PARSER_GEN, BOT_INFO, get_headers
+from melobot import ArgFormatter as Format
+from melobot import Plugin, finish, image_msg, send, send_reply, session
+
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, get_headers
 from ..public_utils import async_http
 from .make_fig import gen_weather_fig
-
 
 weather = Plugin.on_msg(
     checker=COMMON_CHECKER,

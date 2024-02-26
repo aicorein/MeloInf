@@ -1,12 +1,11 @@
 import json
 from random import choice
 from typing import Dict, List
-from melobot import Plugin, session
+
 from melobot import ArgFormatter as Format
-from melobot import send, this_dir, clear_cq
+from melobot import Plugin, clear_cq, send, session, this_dir
 
 from ..env import COMMON_CHECKER, PARSER_GEN
-
 
 be_ill = Plugin.on_msg(
     checker=COMMON_CHECKER,

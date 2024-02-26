@@ -1,5 +1,6 @@
-from PIL import Image, ImageFont, ImageDraw
-from typing import Tuple, List
+from typing import List, Tuple
+
+from PIL import Image, ImageDraw, ImageFont
 
 from ..env import BOT_INFO
 

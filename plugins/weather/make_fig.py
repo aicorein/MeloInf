@@ -1,10 +1,12 @@
-import os
 import io
-import matplotlib.pyplot as plt
+import os
+from math import ceil, floor
 from random import choice
-from PIL import Image
-from math import floor, ceil
 from typing import List, Tuple
+
+import matplotlib.pyplot as plt
+from PIL import Image
+
 from melobot import get_id, this_dir
 
 from ..env import BOT_INFO

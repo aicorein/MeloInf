@@ -1,10 +1,9 @@
-from melobot import Plugin, session
 from melobot import ArgFormatter as Format
-from melobot import send, send_reply, finish
+from melobot import Plugin, PluginBus, finish, image_msg, send_reply, session
 
 from ..env import COMMON_CHECKER, PARSER_GEN
+from ..public_utils import base64_encode
 from .utils import DeckStore, r_gen
-
 
 dice_r = Plugin.on_msg(
     checker=COMMON_CHECKER,
@@ -28,7 +27,14 @@ dice_draw = Plugin.on_msg(
                 src_desc="牌堆名",
                 src_expect="若缺乏牌堆名参数，则显示当前所有可用牌堆",
                 default=None,
-            )
+            ),
+            Format(
+                convert=int,
+                verify=lambda x: 1 <= x <= 10,
+                src_desc="抽牌次数",
+                src_expect="1 <= 次数 <= 10",
+                default=1,
+            ),
         ],
     ),
 )
@@ -53,7 +59,7 @@ class DiceSimulator(Plugin):
 
     @dice_draw
     async def dice_draw(self) -> None:
-        deck_name = session.args.vals.pop(0)
+        deck_name, freq = session.args.vals
         if deck_name is None:
             output = "当前可用牌堆：\n ● " + "\n ● ".join(self.cmd_desks_map.keys())
             output += "\n本功能牌堆来源于：\n ● dice 论坛\n ● Github: @Vescrity"
@@ -61,5 +67,11 @@ class DiceSimulator(Plugin):
         if deck_name not in self.cmd_desks_map.keys():
             await finish(f"牌堆【{deck_name}】不存在")
         deck_group = self.cmd_desks_map[deck_name]
-        output = deck_group.decks[deck_name].draw()[0].strip("\n")
+        samples = deck_group.decks[deck_name].draw(sample_num=freq, replace=True)
+        output = "\n\n".join(
+            map(lambda x: x.replace("\n\n", "\n").strip("\n"), samples)
+        )
+        if len(output) > 200:
+            data = await PluginBus.emit("BaseUtils", "txt2img", output, wait=True)
+            await finish(image_msg(base64_encode(data)))
         await send_reply(output)

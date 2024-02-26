@@ -1,5 +1,6 @@
-from melobot import MeloBot
+import sys
 
+from melobot import MeloBot
 
 bot = MeloBot()
 bot.init("./config")

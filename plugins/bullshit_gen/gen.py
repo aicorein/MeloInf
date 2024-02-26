@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import random
+
 from melobot import this_dir
 
 from .readJSON import 读JSON文件
-
 
 path = this_dir("data.json")
 

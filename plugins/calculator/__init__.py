@@ -1,9 +1,7 @@
-from melobot import Plugin, PluginBus, session
-from melobot import ArgFormatter as Format, CmdParser
-from melobot import send_reply
+from melobot import ArgFormatter as Format
+from melobot import CmdParser, Plugin, PluginBus, send_reply, session
 
 from ..env import COMMON_CHECKER
-
 
 calc = Plugin.on_msg(
     checker=COMMON_CHECKER,

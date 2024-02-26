@@ -1,14 +1,15 @@
 import asyncio as aio
-from melobot import Plugin, session, CmdParser
-from melobot import PluginStore as Store, ArgFormatter as Format
-from melobot import send, send_reply
-from random import random, choice
+from random import choice, random
 from typing import List, Union
 
-from ..env import COMMON_CHECKER, BOT_INFO, PARSER_GEN, WHITE_CHECKER
-from ..public_utils import remove_punctuation, remove_ask_punctuation
-from .dict import WORD_DICT, BOT_FLAG, SENDER_FLAG, OWNER_FLAG, add_pair
+from melobot import ArgFormatter as Format
+from melobot import CmdParser, Plugin
+from melobot import PluginStore as Store
+from melobot import send, send_reply, session
 
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, WHITE_CHECKER
+from ..public_utils import remove_ask_punctuation, remove_punctuation
+from .dict import BOT_FLAG, OWNER_FLAG, SENDER_FLAG, WORD_DICT, add_pair
 
 make_reply = Plugin.on_any_msg(checker=COMMON_CHECKER)
 words_info = Plugin.on_msg(

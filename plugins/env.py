@@ -1,11 +1,9 @@
-import toml
 from copy import deepcopy
-from typing import Union, List, Tuple
+from typing import List, Tuple, Union
 
-from melobot import MsgCheckerGen, CmdParserGen
-from melobot import this_dir
-from melobot import User
+import toml
 
+from melobot import CmdParserGen, MsgCheckerGen, User, this_dir
 
 settings_path = this_dir("./settings.toml")
 with open(settings_path, encoding="utf-8") as fp:

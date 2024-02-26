@@ -1,7 +1,7 @@
 import os
-from melobot import this_dir
 from typing import Dict, List
 
+from melobot import this_dir
 
 words_path = (
     this_dir("words.txt")

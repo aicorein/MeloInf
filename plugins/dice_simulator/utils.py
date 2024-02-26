@@ -1,13 +1,14 @@
 import json
-import toml
 import os
-import re
 import random
-from typing import List, Dict
+import re
+from typing import Dict, List
+
+import toml
+
 from melobot import this_dir
 
 from ..env import BOT_INFO
-
 
 r_regex = re.compile(r"(\d*d\d*)")
 

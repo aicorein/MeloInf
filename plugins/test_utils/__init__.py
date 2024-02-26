@@ -1,10 +1,21 @@
 import asyncio as aio
 from random import randint
-from melobot import AttrSessionRule as AttrRule, ArgFormatter as Format
-from melobot import Plugin, finish, get_id, send, send_hup, session
-from melobot import reply_msg, text_msg
-from melobot import BotHupTimeout
-from ..env import SU_CHECKER, PARSER_GEN
+
+from melobot import ArgFormatter as Format
+from melobot import AttrSessionRule as AttrRule
+from melobot import (
+    BotHupTimeout,
+    Plugin,
+    finish,
+    get_id,
+    reply_msg,
+    send,
+    send_hup,
+    session,
+    text_msg,
+)
+
+from ..env import PARSER_GEN, SU_CHECKER
 
 atest = Plugin.on_msg(
     checker=SU_CHECKER, parser=PARSER_GEN.gen(["异步测试", "atest", "async-test"])

@@ -1,13 +1,23 @@
-import time
 import datetime as dt
+import time
 from typing import List
-from melobot import Plugin, send, send_reply, get_metainfo
-from melobot import ArgFormatter as Format, AttrSessionRule as AttrRule
-from melobot import User, BotLife, bot, session, PriorityLevel
 
-from ..env import PARSER_GEN, COMMON_CHECKER, BOT_INFO, CHECKER_GEN, OWNER_CHECKER
+from melobot import ArgFormatter as Format
+from melobot import AttrSessionRule as AttrRule
+from melobot import (
+    BotLife,
+    Plugin,
+    PriorityLevel,
+    User,
+    bot,
+    get_metainfo,
+    send,
+    send_reply,
+    session,
+)
+
+from ..env import BOT_INFO, CHECKER_GEN, COMMON_CHECKER, OWNER_CHECKER, PARSER_GEN
 from .recovery import read_rec, save_rec
-
 
 META_INFO = get_metainfo()
 BOT_NICKNAME = BOT_INFO.bot_nickname

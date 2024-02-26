@@ -1,12 +1,10 @@
 import asyncio as aio
-from random import randint, choice
+from random import choice, randint
 
-from melobot import Plugin
-from melobot import send, send_reply, finish
-from melobot import image_msg
-from ..env import PARSER_GEN, COMMON_CHECKER, get_headers
-from ..public_utils import base64_encode, async_http
+from melobot import Plugin, finish, image_msg, send, send_reply
 
+from ..env import COMMON_CHECKER, PARSER_GEN, get_headers
+from ..public_utils import async_http, base64_encode
 
 rpic = Plugin.on_msg(
     parser=PARSER_GEN.gen(target=["随机图", "rpic"]), checker=COMMON_CHECKER

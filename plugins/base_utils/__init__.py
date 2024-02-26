@@ -1,7 +1,7 @@
 import io
-from melobot import Plugin, bot, BotLife, session, PluginBus
 from typing import Tuple
-from melobot import text_msg
+
+from melobot import BotLife, Plugin, PluginBus, bot, session, text_msg
 
 from .utils import txt2img, wrap_s
 

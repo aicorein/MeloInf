@@ -1,10 +1,8 @@
-from melobot import Plugin, session
-from melobot import send
 from melobot import ArgFormatter as Format
+from melobot import Plugin, send, session
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from .gen import Generator
-
 
 bullshit_gen = Plugin.on_msg(
     checker=COMMON_CHECKER,
