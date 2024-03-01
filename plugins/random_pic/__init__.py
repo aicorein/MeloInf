@@ -1,10 +1,12 @@
 import asyncio as aio
 from random import choice, randint
 
+import requests
+
 from melobot import Plugin, finish, image_msg, send, send_reply
 
-from ..env import COMMON_CHECKER, PARSER_GEN, get_headers
-from ..public_utils import async_http, base64_encode
+from ..env import COMMON_CHECKER, PARSER_GEN
+from ..public_utils import async_http, base64_encode, get_headers
 
 rpic = Plugin.on_msg(
     parser=PARSER_GEN.gen(target=["随机图", "rpic"]), checker=COMMON_CHECKER
@@ -17,12 +19,15 @@ class RandomPicGen(Plugin):
         self.url_gens = [
             lambda: "https://www.dmoe.cc/random.php",
             lambda: "https://cdn.seovx.com/d/?mom=302",
-            lambda: "https://api.r10086.com/樱道随机图片api接口.php?图片系列=动漫综合{}".format(
-                randint(1, 18)
-            ),
             lambda: "https://img.xjh.me/random_img.php",
             lambda: "https://api.lyiqk.cn/acg",
             lambda: "https://api.lyiqk.cn/miku",
+            lambda: "https://api.r10086.com/樱道随机图片api接口.php?图片系列=动漫综合{}".format(
+                randint(1, 18)
+            ),
+            lambda: requests.get(
+                "http://api.xn--7gqa009h.top/api/sjdm", headers=get_headers()
+            ).json()["url"],
         ]
         self.get_pic_lock = aio.Lock()
 

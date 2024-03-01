@@ -1,9 +1,12 @@
 import base64
 import re
 from contextlib import asynccontextmanager
+from copy import deepcopy
 from typing import AsyncGenerator, Literal
 
 import aiohttp
+
+from .env import SETTINGS
 
 ENG_PUNC = r"""!"#$%&',.:;?@\^"""
 WITHOUT_DOLLAR_ENG_PUNC = r"""!"#%&',.:;?@\^"""
@@ -27,6 +30,10 @@ def base64_encode(data: bytes) -> str:
     code = "base64://"
     code += base64.b64encode(data).decode("utf-8")
     return code
+
+
+def get_headers():
+    return deepcopy(SETTINGS["request_headers"])
 
 
 @asynccontextmanager

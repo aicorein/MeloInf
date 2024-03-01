@@ -91,6 +91,7 @@ class Deck:
         self._items = items
         self.name = deck_name
         self.freqs = [item.freq for item in items]
+        self.count = len(items)
 
     def draw(self, sample_num: int = 1, replace: bool = False) -> List[str]:
         if replace:
@@ -113,6 +114,9 @@ class DeckGroup:
             raise ValueError(f"名为 {deck_name} 的牌堆已存在，请更改牌堆名以避免重名")
         self.decks[deck_name] = deck
 
+    def get_count(self) -> int:
+        return sum({deck.count for deck in self.decks.values()})
+
 
 class DeckStore:
     __store__: Dict[str, DeckGroup] = {}
@@ -124,6 +128,10 @@ class DeckStore:
     @classmethod
     def get_all(cls) -> Dict[str, DeckGroup]:
         return cls.__store__
+
+    @classmethod
+    def get_count(cls) -> int:
+        return sum({group.get_count() for group in cls.__store__.values()})
 
     @classmethod
     def add(cls, group_name: str, group: DeckGroup) -> None:

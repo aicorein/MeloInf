@@ -6,6 +6,7 @@ from melobot import AttrSessionRule as AttrRule
 from melobot import (
     BotHupTimeout,
     Plugin,
+    PluginStore,
     finish,
     get_id,
     reply_msg,
@@ -18,17 +19,31 @@ from melobot import (
 from ..env import PARSER_GEN, SU_CHECKER
 
 atest = Plugin.on_msg(
-    checker=SU_CHECKER, parser=PARSER_GEN.gen(["异步测试", "atest", "async-test"])
+    checker=SU_CHECKER,
+    parser=PARSER_GEN.gen(target=["异步测试", "atest", "async-test"]),
 )
 test_n = Plugin.on_msg(
-    checker=SU_CHECKER, parser=PARSER_GEN.gen(["测试统计", "testn", "test-stat"])
+    checker=SU_CHECKER, parser=PARSER_GEN.gen(target=["测试统计", "testn", "test-stat"])
 )
 stest = Plugin.on_msg(
     checker=SU_CHECKER,
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
     conflict_callback=send("其他的 session 测试进行中...稍后再试"),
-    parser=PARSER_GEN.gen(["会话测试", "stest", "session-test"]),
+    parser=PARSER_GEN.gen(target=["会话测试", "stest", "session-test"]),
+)
+debug = Plugin.on_msg(
+    checker=SU_CHECKER,
+    parser=PARSER_GEN.gen(
+        target=["调试", "debug"],
+        formatters=[
+            Format(
+                convert=lambda x: bool(int(x)),
+                src_desc="开关值",
+                src_expect="1 或 0",
+            )
+        ],
+    ),
 )
 echo = Plugin.on_msg(
     checker=SU_CHECKER,
@@ -117,5 +132,11 @@ class TestUtils(Plugin):
 
     @echo
     async def echo(self) -> None:
-        content = session.args.vals.pop(0)
+        content = session.args.pop(0)
         await send(content, enable_cq=True)
+
+    @debug
+    async def debug(self) -> None:
+        status = session.args.pop(0)
+        flag = PluginStore.get("BaseUtils", "debug_status")
+        await flag.affect(status)

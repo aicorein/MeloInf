@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import List, Tuple, Union
 
 import toml
@@ -31,6 +30,9 @@ class BotInfo:
         self.weather_key: str = CONFIG["weather_key"]
         self.dice_base_r: Tuple[int, int] = tuple(CONFIG["dice_base_r"])
         self.txt2img_font: str = CONFIG["txt2img_font"]
+        self.baidu_translate_appid = CONFIG["baidu_translate_appid"]
+        self.baidu_translate_key = CONFIG["baidu_translate_key"]
+        self.hash_salt = CONFIG["hash_salt"]
 
 
 BOT_INFO = BotInfo()
@@ -48,7 +50,3 @@ OWNER_CHECKER = CHECKER_GEN.gen_group(User.OWNER) | CHECKER_GEN.gen_private(User
 SU_CHECKER = CHECKER_GEN.gen_group(User.SU) | CHECKER_GEN.gen_private(User.SU)
 WHITE_CHECKER = CHECKER_GEN.gen_group(User.WHITE) | CHECKER_GEN.gen_private(User.WHITE)
 COMMON_CHECKER = CHECKER_GEN.gen_group() | CHECKER_GEN.gen_private()
-
-
-def get_headers():
-    return deepcopy(SETTINGS["request_headers"])

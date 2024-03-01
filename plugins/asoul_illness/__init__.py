@@ -33,7 +33,7 @@ class AsoulIllness(Plugin):
 
     @be_ill
     async def be_ill(self) -> None:
-        target = session.args.vals.pop(0)
+        target = session.args.pop(0)
         target = clear_cq(target)
         text_pair = choice(self.data)
         text, person = text_pair["text"], text_pair["person"]

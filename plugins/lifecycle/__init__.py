@@ -133,7 +133,7 @@ class LifeCycleUtils(Plugin):
 
     @life
     async def life(self) -> None:
-        option = session.args.vals.pop(0)
+        option = session.args.pop(0)
         match option:
             case "on":
                 if bot.is_activate:

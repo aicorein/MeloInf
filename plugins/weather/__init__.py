@@ -3,8 +3,8 @@ import asyncio as aio
 from melobot import ArgFormatter as Format
 from melobot import Plugin, finish, image_msg, send, send_reply, session
 
-from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, get_headers
-from ..public_utils import async_http
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
+from ..public_utils import async_http, get_headers
 from .make_fig import gen_weather_fig
 
 weather = Plugin.on_msg(
@@ -40,7 +40,7 @@ class WeatherUtils(Plugin):
 
     @weather
     async def weather(self) -> None:
-        city, days = session.args.vals
+        city, days = session.args
         text_box = []
         min_temps, max_temps = [], []
         async with self.lock:

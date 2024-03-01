@@ -3,8 +3,8 @@ from typing import Dict
 from melobot import ArgFormatter as Format
 from melobot import CmdParser, Plugin, PluginBus, send_reply, session
 
-from ..env import BOT_INFO, COMMON_CHECKER, get_headers
-from ..public_utils import async_http
+from ..env import BOT_INFO, COMMON_CHECKER
+from ..public_utils import async_http, get_headers
 
 code_c = Plugin.on_msg(
     checker=COMMON_CHECKER,
@@ -74,7 +74,7 @@ class CodeCompiler(Plugin):
 
     @code_c
     async def codec(self) -> None:
-        lang, code = session.args.vals
+        lang, code = session.args
         match lang:
             case "cpp":
                 lang_id, ext = 7, "cpp"

@@ -26,6 +26,6 @@ class BullshitGen(Plugin):
 
     @bullshit_gen
     async def bullshit_gen(self) -> None:
-        theme = session.args.vals.pop(0)
+        theme = session.args.pop(0)
         output = Generator(theme, self.length).generate()
         await send(output)

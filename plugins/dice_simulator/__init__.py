@@ -1,5 +1,5 @@
 from melobot import ArgFormatter as Format
-from melobot import Plugin, PluginBus, finish, image_msg, send_reply, session
+from melobot import Plugin, PluginBus, finish, image_msg, send, send_reply, session
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from ..public_utils import base64_encode
@@ -8,7 +8,7 @@ from .utils import DeckStore, r_gen
 dice_r = Plugin.on_msg(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(
-        target="r",
+        target=["r", "随机"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 15,
@@ -21,7 +21,7 @@ dice_r = Plugin.on_msg(
 dice_draw = Plugin.on_msg(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(
-        target="draw",
+        target=["draw", "抽牌"],
         formatters=[
             Format(
                 src_desc="牌堆名",
@@ -38,6 +38,10 @@ dice_draw = Plugin.on_msg(
         ],
     ),
 )
+dice_info = Plugin.on_msg(
+    checker=COMMON_CHECKER,
+    parser=PARSER_GEN.gen(target=["dice-info", "dice模拟器信息"]),
+)
 
 
 class DiceSimulator(Plugin):
@@ -47,9 +51,16 @@ class DiceSimulator(Plugin):
             cmd: group for group in DeckStore.get_all().values() for cmd in group.cmds
         }
 
+    @dice_info
+    async def dice_info(self) -> None:
+        output = "【dice 模拟器信息】\n ● 牌堆文件数：{}\n ● 牌堆总词条数：{}".format(
+            len(DeckStore.get_all()), DeckStore.get_count()
+        )
+        await send(output)
+
     @dice_r
     async def dice_r(self) -> None:
-        s = session.args.vals.pop(0)
+        s = session.args.pop(0)
         try:
             output = r_gen(s)
             await send_reply(output)
@@ -59,7 +70,7 @@ class DiceSimulator(Plugin):
 
     @dice_draw
     async def dice_draw(self) -> None:
-        deck_name, freq = session.args.vals
+        deck_name, freq = session.args
         if deck_name is None:
             output = "当前可用牌堆：\n ● " + "\n ● ".join(self.cmd_desks_map.keys())
             output += "\n本功能牌堆来源于：\n ● dice 论坛\n ● Github: @Vescrity"

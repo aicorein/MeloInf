@@ -94,7 +94,7 @@ class WordlibLoader(Plugin):
     @teach
     async def teach_pair(self) -> None:
         async with self.teach_lock:
-            ask, ans = session.args.vals
+            ask, ans = session.args
             ask = remove_ask_punctuation(ask)
             res = add_pair(ask, ans)
             if res:

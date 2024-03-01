@@ -145,7 +145,7 @@ class ShellManager(Plugin):
 
     @shell
     async def run_in_shell(self) -> None:
-        cmd = session.args.vals.pop(0)
+        cmd = session.args.pop(0)
         if cmd is None:
             self.pointer = (
                 session.event.sender.id,
