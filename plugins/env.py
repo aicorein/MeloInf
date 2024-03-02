@@ -13,9 +13,9 @@ CONFIG = SETTINGS["bot_config"]
 
 class BotInfo:
     def __init__(self) -> None:
-        self.name: str = CONFIG["bot_proj_name"]
-        self.ver: str = CONFIG["bot_proj_ver"]
-        self.src: str = CONFIG["bot_proj_src"]
+        self.proj_name: str = CONFIG["bot_proj_name"]
+        self.proj_ver: str = CONFIG["bot_proj_ver"]
+        self.proj_src: str = CONFIG["bot_proj_src"]
         self.bot_name: str = CONFIG["bot_name"]
         self.bot_nickname: str = CONFIG["bot_nickname"]
         self.uni_cmd_start: Union[str, List[str]] = CONFIG["uni_cmd_start"]
@@ -26,6 +26,7 @@ class BotInfo:
         self.white_users: List[int] = CONFIG["white_users"]
         self.black_users: List[int] = CONFIG["black_users"]
         self.white_groups: List[int] = CONFIG["white_groups"]
+        self.request_proxy: str = CONFIG["request_proxy"]
         self.figure_font: str = CONFIG["figure_font"]
         self.weather_key: str = CONFIG["weather_key"]
         self.dice_base_r: Tuple[int, int] = tuple(CONFIG["dice_base_r"])

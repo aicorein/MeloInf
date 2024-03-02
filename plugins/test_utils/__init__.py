@@ -29,7 +29,7 @@ stest = Plugin.on_msg(
     checker=SU_CHECKER,
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
-    conflict_callback=send("其他的 session 测试进行中...稍后再试"),
+    conflict_cb=lambda: send("其他的 session 测试进行中...稍后再试"),
     parser=PARSER_GEN.gen(target=["会话测试", "stest", "session-test"]),
 )
 debug = Plugin.on_msg(
@@ -65,7 +65,7 @@ class TestUtils(Plugin):
     def __init__(self) -> None:
         super().__init__()
         self.async_t = (1, 6)
-        self.session_t = 1.5
+        self.session_simulate_t = 1.5
         self.session_overtime_t = 10
         self.test_cnt = 0
 
@@ -85,12 +85,12 @@ class TestUtils(Plugin):
 
     @stest
     async def sessoin_test(self) -> None:
-        await aio.sleep(self.session_t)
+        await aio.sleep(self.session_simulate_t)
         cnt = 0
         overtime = False
-        id = session.event.sender.id
+        qid = session.event.sender.id
         resp = await send(
-            f"会话测试开始。识别标记：{id}，模拟间隔：{self.session_t}s。输入 stop 可停止本次会话测试",
+            f"会话测试开始。识别标记：{qid}，模拟间隔：{self.session_simulate_t}s。输入 stop 可停止本次会话测试",
             wait=True,
         )
         start_msg_id = resp.data["message_id"]
@@ -99,32 +99,36 @@ class TestUtils(Plugin):
         )
         if session.event.text == "y":
             overtime = True
+        cnt += 1
 
         while True:
             if "stop" in session.event.text:
                 break
             cnt += 1
-            await aio.sleep(self.session_t)
+            await aio.sleep(self.session_simulate_t)
             try:
+                eid_list_s = f"[{', '.join(['0x%x' %id(e) for e in session.events])}]"
                 if overtime:
                     await send_hup(
-                        f"第 {cnt} 次进入会话：\n事件列表：{session.events}\n",
+                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}\n",
                         overtime=self.session_overtime_t,
                     )
                 else:
                     await send_hup(
-                        f"第 {cnt} 次进入会话：\n事件列表：{session.events}\n"
+                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}\n"
                     )
             except BotHupTimeout:
                 self.test_cnt += 1
                 await finish(
                     [
                         reply_msg(start_msg_id),
-                        text_msg(f"session 挂起等待超时，√ 标记为 {id} 会话测试结束"),
+                        text_msg(f"session 挂起等待超时，√ 标记为 {qid} 会话测试结束"),
                     ]
                 )
         self.test_cnt += 1
-        await finish([reply_msg(start_msg_id), text_msg(f"√ 标记为 {id} 会话测试结束")])
+        await finish(
+            [reply_msg(start_msg_id), text_msg(f"√ 标记为 {qid} 会话测试结束")]
+        )
 
     @test_n
     async def test_stat(self) -> None:

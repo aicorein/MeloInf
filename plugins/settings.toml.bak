@@ -12,7 +12,14 @@ super_users = []
 white_users = []
 black_users = []
 white_groups = []
-# white_groups = []
+request_proxy = 'http://127.0.0.1:7890'
+figure_font = 'simhei'
+weather_key = "xxxxxxxx"
+dice_base_r = [1, 100]
+txt2img_font = 'simhei
+baidu_translate_appid = "xxxxxxxx"
+baidu_translate_key = "xxxxxxxx"
+hash_salt = "xxxxxxxx"
 
 [request_headers]
 User-Agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'

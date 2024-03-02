@@ -33,7 +33,7 @@ status = Plugin.on_msg(
 life = Plugin.on_msg(
     checker=OWNER_CHECKER,
     session_rule=AttrRule("sender", "id"),
-    conflict_callback=send("工作状态切换中...稍后再试~"),
+    conflict_cb=lambda: send("工作状态切换中...稍后再试~"),
     priority=PriorityLevel.MIN,
     parser=PARSER_GEN.gen(
         target=["life", "状态设置"],
@@ -96,9 +96,9 @@ class LifeCycleUtils(Plugin):
             META_INFO.PROJ_NAME,
             f"v{META_INFO.VER}",
             META_INFO.PROJ_SRC,
-            BOT_INFO.name,
-            f"v{BOT_INFO.ver}",
-            BOT_INFO.src,
+            BOT_INFO.proj_name,
+            f"v{BOT_INFO.proj_ver}",
+            BOT_INFO.proj_src,
             META_INFO.PLATFORM,
             META_INFO.PY_VER.split("|")[0],
         )

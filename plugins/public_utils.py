@@ -6,7 +6,7 @@ from typing import AsyncGenerator, Literal
 
 import aiohttp
 
-from .env import SETTINGS
+from .env import BOT_INFO, SETTINGS
 
 ENG_PUNC = r"""!"#$%&',.:;?@\^"""
 WITHOUT_DOLLAR_ENG_PUNC = r"""!"#%&',.:;?@\^"""
@@ -43,9 +43,12 @@ async def async_http(
     headers: dict = None,
     params: dict = None,
     data: dict = None,
+    proxy: bool = False,
 ) -> AsyncGenerator[aiohttp.ClientResponse, None]:
     async with aiohttp.ClientSession(headers=headers) as http_session:
         kwargs = {}
+        if proxy:
+            kwargs["proxy"] = BOT_INFO.request_proxy
         if params:
             kwargs["params"] = params
         if method == "get":

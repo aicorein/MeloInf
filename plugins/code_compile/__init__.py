@@ -8,6 +8,8 @@ from ..public_utils import async_http, get_headers
 
 code_c = Plugin.on_msg(
     checker=COMMON_CHECKER,
+    timeout=25,
+    overtime_cb=lambda: send_reply("代码编译结果获取超时，请稍候再试..."),
     parser=CmdParser(
         cmd_start="*",
         cmd_sep="$",

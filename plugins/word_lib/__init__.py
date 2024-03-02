@@ -5,7 +5,7 @@ from typing import List, Union
 from melobot import ArgFormatter as Format
 from melobot import CmdParser, Plugin
 from melobot import PluginStore as Store
-from melobot import send, send_reply, session
+from melobot import lock, send, send_reply, session
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, WHITE_CHECKER
 from ..public_utils import remove_ask_punctuation, remove_punctuation
@@ -42,7 +42,6 @@ class WordlibLoader(Plugin):
         super().__init__()
         self.bot_id = Store.get("BaseUtils", "bot_id")
         self.special_prob = 0.001
-        self.teach_lock = aio.Lock()
 
     def get_keys(self) -> List[str]:
         text = session.event.text.replace("\n", "").strip(" ")
@@ -92,12 +91,16 @@ class WordlibLoader(Plugin):
         await send(output)
 
     @teach
+    @lock(
+        lambda: send(
+            f"{BOT_INFO.bot_nickname} 学不过来啦，等 {BOT_INFO.bot_nickname} 先学完上一句嘛~"
+        )
+    )
     async def teach_pair(self) -> None:
-        async with self.teach_lock:
-            ask, ans = session.args
-            ask = remove_ask_punctuation(ask)
-            res = add_pair(ask, ans)
-            if res:
-                await send_reply(f"{BOT_INFO.bot_nickname} 学会啦！")
-            else:
-                await send_reply(f"这个 {BOT_INFO.bot_nickname} 已经会了哦~")
+        ask, ans = session.args
+        ask = remove_ask_punctuation(ask)
+        res = add_pair(ask, ans)
+        if res:
+            await send_reply(f"{BOT_INFO.bot_nickname} 学会啦！")
+        else:
+            await send_reply(f"这个 {BOT_INFO.bot_nickname} 已经会了哦~")
