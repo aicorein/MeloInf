@@ -1,4 +1,3 @@
-import asyncio as aio
 from random import choice, random
 from typing import List, Union
 
@@ -11,11 +10,11 @@ from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, WHITE_CHECKER
 from ..public_utils import remove_ask_punctuation, remove_punctuation
 from .dict import BOT_FLAG, OWNER_FLAG, SENDER_FLAG, WORD_DICT, add_pair
 
-make_reply = Plugin.on_any_msg(checker=COMMON_CHECKER)
-words_info = Plugin.on_msg(
+make_reply = Plugin.on_every_message(checker=COMMON_CHECKER)
+words_info = Plugin.on_message(
     checker=COMMON_CHECKER, parser=PARSER_GEN.gen(["w-info", "词库信息"])
 )
-teach = Plugin.on_msg(
+teach = Plugin.on_message(
     checker=WHITE_CHECKER,
     parser=CmdParser(
         cmd_start="*",

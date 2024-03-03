@@ -7,7 +7,7 @@ from melobot import Plugin, clear_cq, send, session, this_dir
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 
-be_ill = Plugin.on_msg(
+be_ill = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(
         target=["发病", "ill"],

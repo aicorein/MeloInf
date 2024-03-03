@@ -1,12 +1,13 @@
 from random import choice, randint
 
-from melobot import Plugin, cooldown, image_msg, send, send_reply
+from melobot import Plugin, cooldown, send, send_reply
+from melobot.models import image_msg
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from ..public_utils import async_http, base64_encode, get_headers
 from .utils import json_pic1
 
-rpic = Plugin.on_msg(
+rpic = Plugin.on_message(
     parser=PARSER_GEN.gen(target=["随机图", "rpic"]),
     checker=COMMON_CHECKER,
     timeout=25,
@@ -26,7 +27,6 @@ class RandomPicGen(Plugin):
             lambda: "https://api.r10086.com/樱道随机图片api接口.php?图片系列=动漫综合{}".format(
                 randint(1, 18)
             ),
-            lambda: json_pic1(),
         ]
 
     async def get_pic_url(self) -> str:

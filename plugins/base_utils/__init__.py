@@ -2,17 +2,9 @@ import io
 import json
 from typing import Tuple
 
-from melobot import (
-    BotAction,
-    BotLife,
-    Plugin,
-    PluginBus,
-    PluginStore,
-    bot,
-    image_msg,
-    session,
-    text_msg,
-)
+from melobot import BotLife, Plugin, PluginBus, PluginStore, bot, session
+from melobot.models import image_msg, text_msg
+from melobot.models import BotAction
 
 from ..public_utils import base64_encode
 from .utils import txt2img, wrap_s

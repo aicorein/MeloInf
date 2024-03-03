@@ -21,16 +21,16 @@ from .recovery import read_rec, save_rec
 
 META_INFO = get_metainfo()
 BOT_NICKNAME = BOT_INFO.bot_nickname
-info = Plugin.on_msg(
+info = Plugin.on_message(
     parser=PARSER_GEN.gen(target=["info", "信息"]), checker=COMMON_CHECKER
 )
-auth = Plugin.on_msg(
+auth = Plugin.on_message(
     parser=PARSER_GEN.gen(target=["auth", "权限"]), checker=COMMON_CHECKER
 )
-status = Plugin.on_msg(
+status = Plugin.on_message(
     parser=PARSER_GEN.gen(target=["status", "状态"]), checker=COMMON_CHECKER
 )
-life = Plugin.on_msg(
+life = Plugin.on_message(
     checker=OWNER_CHECKER,
     session_rule=AttrRule("sender", "id"),
     conflict_cb=lambda: send("工作状态切换中...稍后再试~"),

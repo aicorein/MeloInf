@@ -1,10 +1,11 @@
 from melobot import ArgFormatter as Format
-from melobot import BotException, CmdParser, Plugin, send_reply, session
+from melobot import CmdParser, Plugin, send_reply, session
+from melobot.types import BotException
 
 from ..env import COMMON_CHECKER
 from .utils import get_translated_text
 
-translate = Plugin.on_msg(
+translate = Plugin.on_message(
     checker=COMMON_CHECKER,
     timeout=25,
     overtime_cb=lambda: send_reply("翻译结果获取超时，请稍候再试..."),

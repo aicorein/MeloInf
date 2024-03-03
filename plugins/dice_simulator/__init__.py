@@ -1,11 +1,12 @@
 from melobot import ArgFormatter as Format
-from melobot import Plugin, PluginBus, finish, image_msg, send, send_reply, session
+from melobot import Plugin, PluginBus, finish, send, send_reply, session
+from melobot.models import image_msg
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from ..public_utils import base64_encode
 from .utils import DeckStore, r_gen
 
-dice_r = Plugin.on_msg(
+dice_r = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(
         target=["r", "随机"],
@@ -18,7 +19,7 @@ dice_r = Plugin.on_msg(
         ],
     ),
 )
-dice_draw = Plugin.on_msg(
+dice_draw = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(
         target=["draw", "抽牌"],
@@ -38,7 +39,7 @@ dice_draw = Plugin.on_msg(
         ],
     ),
 )
-dice_info = Plugin.on_msg(
+dice_info = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(target=["dice-info", "dice模拟器信息"]),
 )

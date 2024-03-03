@@ -4,35 +4,34 @@ from random import randint
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
 from melobot import (
-    BotHupTimeout,
     Plugin,
     PluginStore,
     finish,
     get_id,
-    reply_msg,
     send,
     send_hup,
     session,
-    text_msg,
 )
+from melobot.models import image_msg, text_msg, reply_msg
+from melobot.types import SessionHupTimeout
 
 from ..env import PARSER_GEN, SU_CHECKER
 
-atest = Plugin.on_msg(
+atest = Plugin.on_message(
     checker=SU_CHECKER,
     parser=PARSER_GEN.gen(target=["异步测试", "atest", "async-test"]),
 )
-test_n = Plugin.on_msg(
+test_n = Plugin.on_message(
     checker=SU_CHECKER, parser=PARSER_GEN.gen(target=["测试统计", "testn", "test-stat"])
 )
-stest = Plugin.on_msg(
+stest = Plugin.on_message(
     checker=SU_CHECKER,
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
     conflict_cb=lambda: send("其他的 session 测试进行中...稍后再试"),
     parser=PARSER_GEN.gen(target=["会话测试", "stest", "session-test"]),
 )
-debug = Plugin.on_msg(
+debug = Plugin.on_message(
     checker=SU_CHECKER,
     parser=PARSER_GEN.gen(
         target=["调试", "debug"],
@@ -45,7 +44,7 @@ debug = Plugin.on_msg(
         ],
     ),
 )
-echo = Plugin.on_msg(
+echo = Plugin.on_message(
     checker=SU_CHECKER,
     parser=PARSER_GEN.gen(
         target=["复读", "echo"],
@@ -117,7 +116,7 @@ class TestUtils(Plugin):
                     await send_hup(
                         f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}\n"
                     )
-            except BotHupTimeout:
+            except SessionHupTimeout:
                 self.test_cnt += 1
                 await finish(
                     [

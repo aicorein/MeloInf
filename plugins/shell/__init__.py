@@ -15,16 +15,16 @@ from melobot import (
     bot,
     finish,
     get_metainfo,
-    image_msg,
     send,
     session,
 )
+from melobot.models import image_msg
 
 from ..env import OWNER_CHECKER
 from ..public_utils import base64_encode
 
 META_INFO = get_metainfo()
-shell = Plugin.on_msg(
+shell = Plugin.on_message(
     checker=OWNER_CHECKER,
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,

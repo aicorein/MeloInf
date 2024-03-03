@@ -1,13 +1,12 @@
-import asyncio as aio
-
 from melobot import ArgFormatter as Format
-from melobot import Plugin, finish, image_msg, lock, send, send_reply, session
+from melobot import Plugin, finish, lock, send, send_reply, session
+from melobot.models import image_msg
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
 from ..public_utils import async_http, get_headers
 from .make_fig import gen_weather_fig
 
-weather = Plugin.on_msg(
+weather = Plugin.on_message(
     checker=COMMON_CHECKER,
     timeout=25,
     overtime_cb=lambda: send_reply("天气信息获取超时，请稍候再试..."),

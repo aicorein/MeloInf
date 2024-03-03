@@ -6,7 +6,7 @@ from melobot import CmdParser, Plugin, PluginBus, send_reply, session
 from ..env import BOT_INFO, COMMON_CHECKER
 from ..public_utils import async_http, get_headers
 
-code_c = Plugin.on_msg(
+code_c = Plugin.on_message(
     checker=COMMON_CHECKER,
     timeout=25,
     overtime_cb=lambda: send_reply("代码编译结果获取超时，请稍候再试..."),

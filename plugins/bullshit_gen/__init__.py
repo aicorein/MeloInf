@@ -4,7 +4,7 @@ from melobot import Plugin, send, session
 from ..env import COMMON_CHECKER, PARSER_GEN
 from .gen import Generator
 
-bullshit_gen = Plugin.on_msg(
+bullshit_gen = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(
         target=["狗屁不通生成", "bullshit"],

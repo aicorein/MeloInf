@@ -1,14 +1,16 @@
 import asyncio as aio
 import json
 
-from melobot import BotException
+from melobot.types import BotException
 
 from ..public_utils import async_http, get_headers
 
 
 async def json_pic1() -> str:
     url = "http://api.xn--7gqa009h.top/api/sjdm"
-    async with async_http(url, method="get", headers=get_headers(), proxy=True) as resp:
+    async with async_http(
+        url, method="get", headers=get_headers(), proxy=False
+    ) as resp:
         if resp.status != 200:
             raise BotException(f"从 api 获取图片网址失败...，状态码：{resp.status}")
         else:

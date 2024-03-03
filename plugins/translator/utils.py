@@ -1,7 +1,8 @@
 import hashlib
 from typing import Tuple
 
-from melobot import BotException, send_reply
+from melobot import send_reply
+from melobot.types import BotException
 
 from ..env import BOT_INFO
 from ..public_utils import async_http, get_headers

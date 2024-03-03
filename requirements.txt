@@ -1,6 +1,5 @@
-requests>=2.31.0
 aiohttp>=3.9.3
 psutil>=5.9.8
 matplotlib>=3.8.2
 pillow>=10.2.0
-melobot==2.0.0rc10
+melobot>=2.0.0

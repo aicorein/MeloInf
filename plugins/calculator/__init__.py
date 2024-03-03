@@ -3,7 +3,7 @@ from melobot import CmdParser, Plugin, PluginBus, send_reply, session
 
 from ..env import COMMON_CHECKER
 
-calc = Plugin.on_msg(
+calc = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=CmdParser(
         cmd_start=["~", "～"],
