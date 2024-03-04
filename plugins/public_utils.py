@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import AsyncGenerator, Literal
 
 import aiohttp
+from aiohttp import FormData
 
 from .env import BOT_INFO, SETTINGS
 
@@ -32,7 +33,7 @@ def base64_encode(data: bytes) -> str:
     return code
 
 
-def get_headers():
+def get_headers() -> dict:
     return deepcopy(SETTINGS["request_headers"])
 
 

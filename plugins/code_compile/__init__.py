@@ -61,7 +61,7 @@ class CodeCompiler(Plugin):
         ) as resp:
             if resp.status != 200:
                 await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
-                CodeCompiler.LOGGER.error(f"请求失败：{resp.status}")
+                self.LOGGER.error(f"请求失败：{resp.status}")
                 return
             try:
                 ret = await resp.json()
@@ -72,7 +72,7 @@ class CodeCompiler(Plugin):
                 return output
             except Exception as e:
                 await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
-                CodeCompiler.LOGGER.error(f"{e.__class__.__name__} {e}")
+                self.LOGGER.error(f"{e.__class__.__name__} {e}")
 
     @code_c
     async def codec(self) -> None:

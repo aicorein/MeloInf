@@ -1,27 +1,19 @@
 import io
-import json
 from typing import Tuple
 
-from melobot import BotLife, Plugin, PluginBus, PluginStore, bot, session
-from melobot.models import image_msg, text_msg
-from melobot.models import BotAction
+from melobot import BotLife, Plugin, PluginBus, bot, session
+from melobot.models import text_msg
 
-from ..public_utils import base64_encode
 from .utils import txt2img, wrap_s
 
 
 class BaseUtils(Plugin):
-    __share__ = ["bot_name", "bot_id", "debug_status"]
+    __share__ = ["bot_name", "bot_id"]
 
     def __init__(self) -> None:
         super().__init__()
         self.bot_name = None
         self.bot_id = None
-        self.debug_status = False
-
-    @PluginStore.echo("BaseUtils", "debug_status")
-    async def _debug_status_change(self, status: bool) -> None:
-        self.debug_status = status
 
     @PluginBus.on("BaseUtils", "txt2img")
     async def _txt2img(
@@ -33,15 +25,19 @@ class BaseUtils(Plugin):
         color: str = "black",
         margin: Tuple[int, int] = [10, 10],
     ) -> bytes:
-        text = "\n".join(wrap_s(s, wrap_len))
+        lines = s.split("\n")
+        for idx, l in enumerate(lines):
+            if len(l) > wrap_len:
+                lines[idx] = "\n".join(wrap_s(l, wrap_len))
+        text = "\n".join(lines)
         img = txt2img(text, font_size, bg_color, color, margin)
         imgio = io.BytesIO()
         img.save(imgio, format="JPEG", quality=95)
         return imgio.getvalue()
 
     @PluginBus.on("BaseUtils", "txt2msgs")
-    async def txt2msgs(self, s: str, one_msg_len: int = 200):
-        txt_list = wrap_s(s, one_msg_len)
+    async def txt2msgs(self, s: str, one_msg_len: int = 300):
+        txt_list = list(map(lambda x: x.strip("\n"), wrap_s(s, one_msg_len)))
         return [text_msg(txt) for txt in txt_list]
 
     @bot.on(BotLife.CONNECTED)
@@ -50,35 +46,6 @@ class BaseUtils(Plugin):
         if resp.is_ok():
             self.bot_name = resp.data["nickname"]
             self.bot_id = resp.data["user_id"]
-            BaseUtils.LOGGER.info("成功获得 bot 账号信息并存储")
+            self.LOGGER.info("成功获得 bot 账号信息并存储")
         else:
-            BaseUtils.LOGGER.warning("获取 bot 账号信息失败")
-
-    @bot.on(BotLife.ACTION_PRESEND)
-    async def _action_debug(self, action: BotAction) -> None:
-        if hasattr(action, "is_debug"):
-            return
-        if self.debug_status:
-            e_str = (
-                json.dumps(action.trigger.raw, ensure_ascii=False, indent=2)
-                if action.trigger is not None
-                else "<触发事件为空>"
-            )
-            a_str = action.flatten(indent=2)
-            debug_action = action.copy()
-            output = f"event:\n{e_str}\n\naction:\n{a_str}"
-            if len(output) <= 10000:
-                data = await PluginBus.emit(
-                    "BaseUtils", "txt2img", output, 200, 14, wait=True
-                )
-                data = base64_encode(data)
-                debug_action.params["message"] = [image_msg(data)]
-
-            else:
-                debug_action.params["message"] = [
-                    text_msg("[调试输出过长，请使用调试器]")
-                ]
-            if debug_action.resp_id:
-                debug_action.resp_id = None
-            debug_action.is_debug = True
-            await session.custom_action(debug_action)
+            self.LOGGER.warning("获取 bot 账号信息失败")

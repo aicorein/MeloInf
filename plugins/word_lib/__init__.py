@@ -4,7 +4,7 @@ from typing import List, Union
 from melobot import ArgFormatter as Format
 from melobot import CmdParser, Plugin
 from melobot import PluginStore as Store
-from melobot import lock, send, send_reply, session
+from melobot import event, lock, msg_text, send, send_reply, session
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, WHITE_CHECKER
 from ..public_utils import remove_ask_punctuation, remove_punctuation
@@ -43,12 +43,12 @@ class WordlibLoader(Plugin):
         self.special_prob = 0.001
 
     def get_keys(self) -> List[str]:
-        text = session.event.text.replace("\n", "").strip(" ")
+        text = msg_text().replace("\n", "").strip(" ")
         text = remove_punctuation(text)
         text = text.replace(BOT_INFO.bot_name, BOT_FLAG).replace(
             BOT_INFO.bot_nickname, BOT_FLAG
         )
-        for item in session.event.content:
+        for item in event().content:
             if item["type"] == "at" and int(item["data"]["qq"]) == self.bot_id.val:
                 keys = []
                 keys.append(f"{BOT_FLAG}{text}")
@@ -66,9 +66,7 @@ class WordlibLoader(Plugin):
         if BOT_FLAG in output:
             output = output.replace(BOT_FLAG, BOT_INFO.bot_nickname)
         if SENDER_FLAG in output:
-            output = output.replace(
-                SENDER_FLAG, f"[CQ:at,qq={session.event.sender.id}] "
-            )
+            output = output.replace(SENDER_FLAG, f"[CQ:at,qq={event().sender.id}] ")
         if OWNER_FLAG in output:
             output = output.replace(OWNER_FLAG, f"[CQ:at,qq={BOT_INFO.owner}] ")
         output = output if len(output) > 0 else None
@@ -82,7 +80,7 @@ class WordlibLoader(Plugin):
         keys = self.get_keys()
         output = self.get_random_reply(keys)
         if output:
-            await send(output, enable_cq=True)
+            await send(output, cq_str=True)
 
     @words_info
     async def words_info(self) -> None:

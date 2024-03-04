@@ -53,7 +53,7 @@ class WeatherUtils(Plugin):
         ) as resp:
             if resp.status != 200:
                 await send_reply("城市 id 查询失败...请稍后再试，或联系 bot 管理员解决")
-                WeatherUtils.LOGGER.error(f"请求失败：{resp.status}")
+                self.LOGGER.error(f"请求失败：{resp.status}")
                 return
             else:
                 res = await resp.json()
@@ -73,7 +73,7 @@ class WeatherUtils(Plugin):
                 await send_reply(
                     "城市当前天气获取失败...请稍后再试，或联系 bot 管理员解决"
                 )
-                WeatherUtils.LOGGER.error(f"请求失败：{resp.status}")
+                self.LOGGER.error(f"请求失败：{resp.status}")
                 return
             else:
                 res = await resp.json()
@@ -90,7 +90,7 @@ class WeatherUtils(Plugin):
                 await send_reply(
                     "城市多天天气获取失败...请稍后再试，或联系 bot 管理员解决"
                 )
-                WeatherUtils.LOGGER.error(f"请求失败：{resp.status}")
+                self.LOGGER.error(f"请求失败：{resp.status}")
                 return
             else:
                 res = await resp.json()

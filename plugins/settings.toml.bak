@@ -1,7 +1,7 @@
 [bot_config]
 bot_proj_name = "MeloInf"
 bot_proj_ver = "1.0.0a1"
-bot_proj_src = "https://github.com/AiCorein/MeloInf"
+bot_proj_src = "https://github.com/aicorein/MeloInf"
 bot_name = "meloinf"
 bot_nickname = "meloinf"
 uni_cmd_start = ["*"]
@@ -20,6 +20,8 @@ txt2img_font = 'simhei
 baidu_translate_appid = "xxxxxxxx"
 baidu_translate_key = "xxxxxxxx"
 hash_salt = "xxxxxxxx"
+everyday_news_time = "08:00:00"
+everyday_news_group = []
 
 [request_headers]
 User-Agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'

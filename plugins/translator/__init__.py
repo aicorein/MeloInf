@@ -42,4 +42,4 @@ class Translator(Plugin):
             output = "【模式 {} -> {}】\n{}".format(_from, to, translated)
             await send_reply(output)
         except BotException as e:
-            Translator.LOGGER.error(e.__str__())
+            self.LOGGER.error(e.__str__())

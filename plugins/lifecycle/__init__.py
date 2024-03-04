@@ -10,6 +10,7 @@ from melobot import (
     PriorityLevel,
     User,
     bot,
+    event,
     get_metainfo,
     send,
     send_reply,
@@ -87,7 +88,7 @@ class LifeCycleUtils(Plugin):
             await session.custom_send(
                 f"{BOT_NICKNAME} 重启完成~", is_private, sender_id, group_id
             )
-            LifeCycleUtils.LOGGER.info("本次启动为指令触发的重启，已回复重启成功消息")
+            self.LOGGER.info("本次启动为指令触发的重启，已回复重启成功消息")
 
     @info
     async def info(self) -> None:
@@ -106,7 +107,7 @@ class LifeCycleUtils(Plugin):
 
     @auth
     async def auth(self) -> None:
-        u_level = CHECKER_GEN.gen_base()._get_level(session.event)
+        u_level = CHECKER_GEN.gen_base()._get_level(event())
         alist = [
             BOT_NICKNAME,
             u_level >= User.OWNER,
@@ -146,7 +147,7 @@ class LifeCycleUtils(Plugin):
                 bot.slack()
             case "stop":
                 await send(f"{BOT_NICKNAME} 下班啦~")
-                LifeCycleUtils.LOGGER.info("指令触发停止操作，正在关闭 bot")
+                self.LOGGER.info("指令触发停止操作，正在关闭 bot")
                 await bot.close()
             case "restart" | "re":
                 if bot.is_module_run():

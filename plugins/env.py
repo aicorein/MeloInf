@@ -31,9 +31,11 @@ class BotInfo:
         self.weather_key: str = CONFIG["weather_key"]
         self.dice_base_r: Tuple[int, int] = tuple(CONFIG["dice_base_r"])
         self.txt2img_font: str = CONFIG["txt2img_font"]
-        self.baidu_translate_appid = CONFIG["baidu_translate_appid"]
-        self.baidu_translate_key = CONFIG["baidu_translate_key"]
-        self.hash_salt = CONFIG["hash_salt"]
+        self.baidu_translate_appid: str = CONFIG["baidu_translate_appid"]
+        self.baidu_translate_key: str = CONFIG["baidu_translate_key"]
+        self.hash_salt: str = CONFIG["hash_salt"]
+        self.news_time: str = CONFIG["everyday_news_time"]
+        self.news_gruop: List[int] = CONFIG["everyday_news_group"]
 
 
 BOT_INFO = BotInfo()

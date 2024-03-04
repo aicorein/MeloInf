@@ -46,7 +46,7 @@ class RandomPicGen(Plugin):
         async with async_http(url=url, method="get", headers=get_headers()) as resp:
             if resp.status != 200:
                 await send_reply("图片获取失败...请稍后再试，或联系 bot 管理员解决")
-                RandomPicGen.LOGGER.error(f"请求失败：{resp.status}")
+                self.LOGGER.error(f"请求失败：{resp.status}")
                 return
             try:
                 data = await resp.read()
@@ -54,4 +54,4 @@ class RandomPicGen(Plugin):
                 await send(image_msg(code), wait=True)
             except Exception as e:
                 await send_reply("图片获取失败...请稍后再试，或联系 bot 管理员解决")
-                RandomPicGen.LOGGER.error(f"{e.__class__.__name__} {e}")
+                self.LOGGER.error(f"{e.__class__.__name__} {e}")

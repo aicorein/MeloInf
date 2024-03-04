@@ -13,8 +13,10 @@ from melobot import (
     Plugin,
     PluginBus,
     bot,
+    event,
     finish,
     get_metainfo,
+    msg_text,
     send,
     session,
 )
@@ -66,7 +68,7 @@ class ShellManager(Plugin):
             aio.create_task(self.output_watch(self.shell.stderr)),
             aio.create_task(self.buf_monitor()),
         ]
-        ShellManager.LOGGER.info("IShell 服务已开启")
+        self.LOGGER.info("IShell 服务已开启")
 
     @bot.on(BotLife.BEFORE_STOP)
     async def close_shell(self) -> None:
@@ -74,7 +76,7 @@ class ShellManager(Plugin):
             t.cancel()
         self.shell.terminate()
         await self.shell.wait()
-        ShellManager.LOGGER.info("Ishell 服务已正常关闭")
+        self.LOGGER.info("Ishell 服务已正常关闭")
 
     async def output_watch(self, stream: aio.StreamReader) -> None:
         try:
@@ -89,7 +91,7 @@ class ShellManager(Plugin):
                         if self.pointer:
                             self._buf.append((time.time(), output))
                 except Exception as e:
-                    ShellManager.LOGGER.warning(f"IShell 输出转发遇到问题，警告：{e}")
+                    self.LOGGER.warning(f"IShell 输出转发遇到问题，警告：{e}")
         except aio.CancelledError:
             pass
 
@@ -123,7 +125,7 @@ class ShellManager(Plugin):
         except aio.CancelledError:
             pass
         except Exception as e:
-            ShellManager.LOGGER.error(f"IShell 缓存异常，错误：{e}")
+            self.LOGGER.error(f"IShell 缓存异常，错误：{e}")
 
     def kill_childs(self) -> None:
         p = psutil.Process(self.shell.pid)
@@ -133,9 +135,9 @@ class ShellManager(Plugin):
 
     async def execute(self, text: str) -> None:
         match text:
-            case "$ctrlc$":
+            case "$cc$":
                 self.kill_childs()
-            case "$exit$":
+            case "$e$":
                 self.pointer = None
                 await finish("shell 交互模式已关闭")
             case "$\\n$":
@@ -148,20 +150,20 @@ class ShellManager(Plugin):
         cmd = session.args.pop(0)
         if cmd is None:
             self.pointer = (
-                session.event.sender.id,
-                session.event.is_private(),
-                session.event.group_id,
+                event().sender.id,
+                event().is_private(),
+                event().group_id,
             )
             tip = (
                 "已进入交互 shell。\n"
                 + "使用 $\\n$ 发送一个回车\n"
-                + "使用 $ctrlc$ 结束其内部程序执行\n"
-                + "使用 $exit$ 退出交互状态"
+                + "使用 $cc$ 结束其内部程序执行\n"
+                + "使用 $e$ 退出交互状态"
             )
             await send(tip)
             while True:
                 await session.suspend()
-                await self.execute(session.event.text)
+                await self.execute(msg_text())
         else:
             p = await aio.create_subprocess_shell(
                 cmd,
