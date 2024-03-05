@@ -2,16 +2,17 @@ import os
 import pickle
 from typing import Union
 
-from melobot import event
+from melobot import msg_event
 
 
 def save_rec(plugin_root: str, rec_name: str) -> None:
     with open(os.path.join(plugin_root, rec_name), "wb") as fp:
+        event = msg_event()
         pickle.dump(
             [
-                event().sender.id,
-                event().is_private(),
-                event().group_id,
+                event.sender.id,
+                event.is_private(),
+                event.group_id,
             ],
             fp,
         )

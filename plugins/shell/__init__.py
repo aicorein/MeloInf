@@ -13,9 +13,9 @@ from melobot import (
     Plugin,
     PluginBus,
     bot,
-    event,
     finish,
     get_metainfo,
+    msg_event,
     msg_text,
     send,
     session,
@@ -149,10 +149,11 @@ class ShellManager(Plugin):
     async def run_in_shell(self) -> None:
         cmd = session.args.pop(0)
         if cmd is None:
+            event = msg_event()
             self.pointer = (
-                event().sender.id,
-                event().is_private(),
-                event().group_id,
+                event.sender.id,
+                event.is_private(),
+                event.group_id,
             )
             tip = (
                 "已进入交互 shell。\n"
@@ -162,7 +163,7 @@ class ShellManager(Plugin):
             )
             await send(tip)
             while True:
-                await session.suspend()
+                await session.hup()
                 await self.execute(msg_text())
         else:
             p = await aio.create_subprocess_shell(

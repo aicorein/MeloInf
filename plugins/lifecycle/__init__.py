@@ -7,11 +7,11 @@ from melobot import AttrSessionRule as AttrRule
 from melobot import (
     BotLife,
     Plugin,
-    PriorityLevel,
+    PriorLevel,
     User,
     bot,
-    event,
     get_metainfo,
+    msg_event,
     send,
     send_reply,
     session,
@@ -35,7 +35,7 @@ life = Plugin.on_message(
     checker=OWNER_CHECKER,
     session_rule=AttrRule("sender", "id"),
     conflict_cb=lambda: send("工作状态切换中...稍后再试~"),
-    priority=PriorityLevel.MIN,
+    priority=PriorLevel.MIN,
     parser=PARSER_GEN.gen(
         target=["life", "状态设置"],
         formatters=[
@@ -107,7 +107,7 @@ class LifeCycleUtils(Plugin):
 
     @auth
     async def auth(self) -> None:
-        u_level = CHECKER_GEN.gen_base()._get_level(event())
+        u_level = CHECKER_GEN.gen_base()._get_level(msg_event())
         alist = [
             BOT_NICKNAME,
             u_level >= User.OWNER,

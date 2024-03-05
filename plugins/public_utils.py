@@ -5,7 +5,6 @@ from copy import deepcopy
 from typing import AsyncGenerator, Literal
 
 import aiohttp
-from aiohttp import FormData
 
 from .env import BOT_INFO, SETTINGS
 

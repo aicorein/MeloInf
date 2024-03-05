@@ -12,10 +12,11 @@ from melobot import (
     PluginBus,
     PluginStore,
     bot,
-    event,
     finish,
     get_id,
+    msg_event,
     msg_text,
+    notice_event,
     send,
     send_hup,
     send_reply,
@@ -108,7 +109,7 @@ class TestUtils(Plugin):
         await aio.sleep(self.session_simulate_t)
         cnt = 0
         overtime = False
-        qid = event().sender.id
+        qid = msg_event().sender.id
         resp = await send(
             f"会话测试开始。识别标记：{qid}，模拟间隔：{self.session_simulate_t}s。输入 stop 可停止本次会话测试",
             wait=True,
@@ -166,32 +167,28 @@ class TestUtils(Plugin):
 
     @bot.on(BotLife.ACTION_PRESEND)
     async def _io_debug(self, action: BotAction) -> None:
-        if hasattr(action, "io_debug"):
+        if action.flag_check("TestUtils", "io-debug"):
             return
-        if self.io_debug_flag:
-            e_str = (
-                json.dumps(action.trigger.raw, ensure_ascii=False, indent=2)
-                if action.trigger is not None
-                else "<触发事件为空>"
-            )
-            a_str = action.flatten(indent=2)
-            debug_action = action.copy()
-            output = f"event:\n{e_str}\n\naction:\n{a_str}"
-            if len(output) <= 10000:
-                data = await PluginBus.emit(
-                    "BaseUtils", "txt2img", output, 200, 14, wait=True
-                )
-                data = base64_encode(data)
-                debug_action.params["message"] = [image_msg(data)]
+        if not self.io_debug_flag:
+            return
+        if action.trigger is None or "message" not in action.params.keys():
+            return
 
-            else:
-                debug_action.params["message"] = [
-                    text_msg("[调试输出过长，请使用调试器]")
-                ]
-            if debug_action.resp_id:
-                debug_action.resp_id = None
-            debug_action.io_debug = True
-            await session.custom_action(debug_action)
+        e_str = json.dumps(action.trigger.raw, ensure_ascii=False, indent=2)
+        a_str = action.flatten(indent=2)
+        debug_action = action.copy()
+        output = f"event:\n{e_str}\n\naction:\n{a_str}"
+        if len(output) <= 10000:
+            data = await PluginBus.emit(
+                "BaseUtils", "txt2img", output, 100, 16, wait=True
+            )
+            data = base64_encode(data)
+            debug_action.params["message"] = [image_msg(data)]
+        else:
+            debug_action.params["message"] = [text_msg("[调试输出过长，请使用调试器]")]
+        debug_action.resp_id = None
+        debug_action.mark("TestUtils", "io-debug")
+        await session.custom_action(debug_action)
 
     async def format_send(self, send_func: AsyncFunc[None], s: str) -> None:
         if len(s) <= 300:
@@ -199,7 +196,7 @@ class TestUtils(Plugin):
         elif len(s) > 10000:
             await send_func("<返回结果长度大于 10000，请使用调试器>")
         else:
-            data = await PluginBus.emit("BaseUtils", "txt2img", s, 200, 14, wait=True)
+            data = await PluginBus.emit("BaseUtils", "txt2img", s, 100, 16, wait=True)
             data = base64_encode(data)
             await send_func(image_msg(data))
 
@@ -215,13 +212,13 @@ class TestUtils(Plugin):
         imports = {}
         var_map = {"bot": bot.__origin__}
         while True:
-            await session.suspend()
+            await session.hup()
             match msg_text():
                 case "$e$":
                     await finish("已退出核心调试状态")
                 case "$i$":
                     await send("【开始导入在调试时可用的模块】\n$e$ 退出导入操作")
-                    await session.suspend()
+                    await session.hup()
                     try:
                         text = msg_text()
                         if text == "$e$":
@@ -241,7 +238,7 @@ class TestUtils(Plugin):
                         await send(
                             f"【输入修改后的值：】\n$e$ 退出修改操作\n当前指向对象：{pointer}"
                         )
-                        await session.suspend()
+                        await session.hup()
                         try:
                             text = msg_text()
                             if text == "$e$":
@@ -269,13 +266,14 @@ class TestUtils(Plugin):
 
     @poke
     async def poke(self) -> None:
-        if event().notice_user_id != self.bot_id.val:
+        event = notice_event()
+        if event.notice_user_id != self.bot_id.val:
             return
-        poke_qid = event().notice_operator_id
+        poke_qid = event.notice_operator_id
         await session.custom_send(
             touch_msg(poke_qid),
-            not event().is_group(),
-            event().notice_operator_id,
-            event().notice_group_id if event().is_group() else None,
+            not event.is_group(),
+            event.notice_operator_id,
+            event.notice_group_id if event.is_group() else None,
             waitResp=True,
         )

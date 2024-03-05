@@ -3,8 +3,8 @@ from melobot import (
     Plugin,
     PluginStore,
     cooldown,
-    event,
     finish,
+    msg_event,
     send,
     send_reply,
     session,
@@ -41,16 +41,16 @@ class PicRecognizer(Plugin):
     async def anime_recogize(self) -> None:
         await send("【欢迎使用识番功能】\n现在请发送番剧截图")
         try:
-            await session.suspend(overtime=20)
+            await session.hup(overtime=20)
         except SessionHupTimeout:
             await send_reply("等待发送图片超时，识番任务已取消")
             return
 
-        results = event().cq_get("image", "url")
-        if results is None:
+        params = msg_event().get_cq_params("image", "url")
+        if len(params) <= 0:
             await send_reply("发送的消息未识别到图片，识番功能已退出")
             return
-        req_url = self.anime_search_url + results.pop(0)
+        req_url = self.anime_search_url + params.pop(0)
         async with async_http(req_url, method="get", headers=get_headers()) as resp:
             if resp.status != 200:
                 self.LOGGER.error(f"识别番剧 api 返回结果异常，状态码：{resp.status}")
