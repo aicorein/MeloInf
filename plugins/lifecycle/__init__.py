@@ -69,7 +69,7 @@ class LifeCycleUtils(Plugin):
 
     @property
     def format_running_time(self) -> str:
-        def format_nums(*timeNum: List[int]) -> str:
+        def format_nums(*timeNum: int) -> list[str]:
             return [str(num) if num >= 10 else "0" + str(num) for num in timeNum]
 
         worked_time = int(time.time() - self.start_moment)
@@ -82,7 +82,7 @@ class LifeCycleUtils(Plugin):
 
     @bot.on(BotLife.CONNECTED)
     async def restart_wake(self) -> None:
-        res = read_rec(self.ROOT, self.rec_name)
+        res = read_rec(str(self.ROOT), self.rec_name)
         if res is not None:
             sender_id, is_private, group_id = res
             await session.custom_send(
@@ -152,7 +152,7 @@ class LifeCycleUtils(Plugin):
             case "restart" | "re":
                 if bot.is_module_run():
                     await send(f"{BOT_NICKNAME} 正在准备重启...")
-                    save_rec(self.ROOT, self.rec_name)
+                    save_rec(str(self.ROOT), self.rec_name)
                     await bot.restart()
                 else:
                     await send(

@@ -1,6 +1,6 @@
 import os
 import pickle
-from typing import Union
+from typing import Optional
 
 from melobot import msg_event
 
@@ -18,7 +18,7 @@ def save_rec(plugin_root: str, rec_name: str) -> None:
         )
 
 
-def read_rec(plugin_root: str, rec_name: str) -> Union[None, tuple]:
+def read_rec(plugin_root: str, rec_name: str) -> Optional[tuple]:
     path = os.path.join(plugin_root, rec_name)
     if not os.path.exists(path):
         return None

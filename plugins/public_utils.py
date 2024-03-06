@@ -2,7 +2,7 @@ import base64
 import re
 from contextlib import asynccontextmanager
 from copy import deepcopy
-from typing import AsyncGenerator, Literal
+from typing import AsyncGenerator, Literal, Optional
 
 import aiohttp
 
@@ -40,9 +40,9 @@ def get_headers() -> dict:
 async def async_http(
     url: str,
     method: Literal["get", "post"],
-    headers: dict = None,
-    params: dict = None,
-    data: dict = None,
+    headers: Optional[dict] = None,
+    params: Optional[dict] = None,
+    data: Optional[dict] = None,
     proxy: bool = False,
 ) -> AsyncGenerator[aiohttp.ClientResponse, None]:
     async with aiohttp.ClientSession(headers=headers) as http_session:

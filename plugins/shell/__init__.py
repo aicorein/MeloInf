@@ -1,7 +1,7 @@
 import asyncio as aio
 import subprocess
 import time
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple
 
 import psutil
 
@@ -21,6 +21,7 @@ from melobot import (
     session,
 )
 from melobot.models import image_msg
+from melobot.types import BotException, CQMsgDict
 
 from ..env import OWNER_CHECKER
 from ..public_utils import base64_encode
@@ -43,14 +44,17 @@ shell = Plugin.on_message(
 class ShellManager(Plugin):
     def __init__(self) -> None:
         super().__init__()
-        self.shell: aio.subprocess.Process = None
+        self.shell: aio.subprocess.Process
         self.executable = "powershell" if META_INFO.PLATFORM == "win32" else "sh"
         self.encoding = "utf-8" if META_INFO.PLATFORM != "win32" else "gbk"
         self.line_sep = META_INFO.LINE_SEP
-        self.pointer: Tuple[int, bool, Union[int, None]] = None
-        self.tasks: List[aio.Task] = None
+        self.pointer: Optional[Tuple[int, bool, Optional[int]]] = None
+        self.tasks: List[aio.Task]
+        self.stdin: aio.StreamWriter
+        self.stdout: aio.StreamReader
+        self.stderr: aio.StreamReader
 
-        self._buf = []
+        self._buf: list[tuple[float, str]] = []
         self._cache_time = 0.3
 
     @bot.on(BotLife.LOADED)
@@ -63,9 +67,18 @@ class ShellManager(Plugin):
             stderr=subprocess.PIPE,
             cwd=str(self.ROOT),
         )
+        if (
+            self.shell.stdout is None
+            or self.shell.stderr is None
+            or self.shell.stdin is None
+        ):
+            raise BotException("IShell 进程输入输出异常")
+        self.stdin = self.shell.stdin
+        self.stdout = self.shell.stdout
+        self.stderr = self.shell.stderr
         self.tasks = [
-            aio.create_task(self.output_watch(self.shell.stdout)),
-            aio.create_task(self.output_watch(self.shell.stderr)),
+            aio.create_task(self.output_watch(self.stdout)),
+            aio.create_task(self.output_watch(self.stderr)),
             aio.create_task(self.buf_monitor()),
         ]
         self.LOGGER.info("IShell 服务已开启")
@@ -96,7 +109,7 @@ class ShellManager(Plugin):
             pass
 
     def intput_send(self, s: str) -> None:
-        self.shell.stdin.write(f"{s}\n".encode(self.encoding))
+        self.stdin.write(f"{s}\n".encode(self.encoding))
 
     async def buf_monitor(self) -> None:
         try:
@@ -112,6 +125,7 @@ class ShellManager(Plugin):
                         continue
                     if self.pointer:
                         p = self.pointer
+                        msg: str | CQMsgDict
                         if len(s) > 200:
                             data = await PluginBus.emit(
                                 "BaseUtils", "txt2img", s, wait=True

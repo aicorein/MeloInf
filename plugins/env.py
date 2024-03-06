@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 import toml
 
@@ -18,8 +18,8 @@ class BotInfo:
         self.proj_src: str = CONFIG["bot_proj_src"]
         self.bot_name: str = CONFIG["bot_name"]
         self.bot_nickname: str = CONFIG["bot_nickname"]
-        self.uni_cmd_start: Union[str, List[str]] = CONFIG["uni_cmd_start"]
-        self.uni_cmd_sep: Union[str, List[str]] = CONFIG["uni_cmd_sep"]
+        self.uni_cmd_start: str | list[str] = CONFIG["uni_cmd_start"]
+        self.uni_cmd_sep: str | list[str] = CONFIG["uni_cmd_sep"]
         self.uni_default_flag: str = CONFIG["uni_default_flag"]
         self.owner: int = CONFIG["owner"]
         self.super_users: List[int] = CONFIG["super_users"]

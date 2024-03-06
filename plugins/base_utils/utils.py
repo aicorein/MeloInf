@@ -10,7 +10,7 @@ def txt2img(
     font_size: int = 18,
     bg_color: str = "white",
     color: str = "black",
-    margin: Tuple[int, int] = [10, 10],
+    margin: Tuple[int, int] = (10, 10),
     align: str = "left",
 ) -> Image.Image:
     font = ImageFont.truetype(BOT_INFO.txt2img_font, size=font_size)

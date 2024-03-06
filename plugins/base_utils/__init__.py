@@ -23,7 +23,7 @@ class BaseUtils(Plugin):
         font_size: int = 18,
         bg_color: str = "white",
         color: str = "black",
-        margin: Tuple[int, int] = [10, 10],
+        margin: Tuple[int, int] = (10, 10),
     ) -> bytes:
         lines = s.split("\n")
         for idx, l in enumerate(lines):

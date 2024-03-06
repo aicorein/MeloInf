@@ -2,11 +2,12 @@ import json
 import os
 import random
 import re
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import toml
 
 from melobot import this_dir
+from melobot.types import BotException
 
 from ..env import BOT_INFO
 
@@ -39,7 +40,7 @@ class DeckItem:
             self.sample_num = sample_num
             self.replace = replace
             self.pos = pos
-            self.res: str = None
+            self.res: list[str]
 
     def __init__(self, raw: str, group_name: str) -> None:
         self._deck_regex = re.compile(r"\{(.+?)\}")
@@ -55,9 +56,9 @@ class DeckItem:
         ss = self._var_regex.split(self.exp)
         for i in range(1, len(ss), 2):
             ss[i] = r_gen(ss[i])
-        ss = "".join(ss)
+        join_ss = "".join(ss)
 
-        ss = self._deck_regex.split(ss)
+        ss = self._deck_regex.split(join_ss)
         draw_recs: Dict[str, DeckItem.DrawRecords] = {}
         for i in range(1, len(ss), 2):
             replace = True
@@ -77,6 +78,10 @@ class DeckItem:
 
         for rec in draw_recs.values():
             cur_group = DeckStore.get(self.namespace)
+            if cur_group is None:
+                raise BotException(
+                    f"在格式化牌堆项目时，遇到了不存在的牌堆组，尝试获取的牌堆组：{self.namespace}"
+                )
             deck = cur_group.decks[rec.deck_name]
             rec.res = deck.draw(rec.sample_num, rec.replace)
         for rec in draw_recs.values():
@@ -122,7 +127,7 @@ class DeckStore:
     __store__: Dict[str, DeckGroup] = {}
 
     @classmethod
-    def get(cls, group_name: str) -> DeckGroup | None:
+    def get(cls, group_name: str) -> Optional[DeckGroup]:
         return cls.__store__.get(group_name)
 
     @classmethod

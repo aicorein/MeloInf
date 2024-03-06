@@ -2,6 +2,7 @@ from typing import Dict
 
 from melobot import ArgFormatter as Format
 from melobot import CmdParser, Plugin, PluginBus, send_reply, session
+from melobot.types import BotException
 
 from ..env import BOT_INFO, COMMON_CHECKER
 from ..public_utils import async_http, get_headers
@@ -61,8 +62,7 @@ class CodeCompiler(Plugin):
         ) as resp:
             if resp.status != 200:
                 await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
-                self.LOGGER.error(f"请求失败：{resp.status}")
-                return
+                raise BotException(f"远端编译请求失败：{resp.status}")
             try:
                 ret = await resp.json()
                 if ret["errors"] != "\n\n":
@@ -72,7 +72,7 @@ class CodeCompiler(Plugin):
                 return output
             except Exception as e:
                 await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
-                self.LOGGER.error(f"{e.__class__.__name__} {e}")
+                raise BotException(f"远端编译请求异常：{e.__class__.__name__} {e}")
 
     @code_c
     async def codec(self) -> None:

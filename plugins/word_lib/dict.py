@@ -12,9 +12,9 @@ words_path = (
 
 with open(words_path, encoding="utf-8") as fp:
     alist = fp.readlines()
-alist = map(lambda x: x.rstrip("\n").split("##"), alist)
+amap = map(lambda x: x.rstrip("\n").split("##"), alist)
 adict: Dict[str, List[str]] = {}
-for k, v in alist:
+for k, v in amap:
     dict_val = adict.get(k)
     if dict_val is None:
         adict[k] = [v]

@@ -24,7 +24,7 @@ anime_recognize = Plugin.on_message(
 )
 
 
-class PicRecognizer(Plugin):
+class AnimeSearcher(Plugin):
     def __init__(self) -> None:
         super().__init__()
         self.bot_id = PluginStore.get("BaseUtils", "bot_id")
@@ -35,7 +35,7 @@ class PicRecognizer(Plugin):
     @anime_recognize
     @cooldown(
         lambda: send("当前有一个识番任务运行中，稍候再试~"),
-        lambda t: "识番功能冷却中，剩余：%.2fs" % t,
+        lambda t: send("识番功能冷却中，剩余：%.2fs" % t),
         interval=10,
     )
     async def anime_recogize(self) -> None:

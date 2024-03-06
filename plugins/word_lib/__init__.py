@@ -1,5 +1,5 @@
 from random import choice, random
-from typing import List, Union
+from typing import List, cast
 
 from melobot import ArgFormatter as Format
 from melobot import CmdParser, Plugin
@@ -56,7 +56,7 @@ class WordlibLoader(Plugin):
                 return keys
         return [text]
 
-    def get_random_reply(self, keys: List[str]) -> Union[str, None]:
+    def get_random_reply(self, keys: List[str]) -> str:
         res: List[str] = []
         for k in keys:
             v = WORD_DICT.get(k)
@@ -69,8 +69,7 @@ class WordlibLoader(Plugin):
             output = output.replace(SENDER_FLAG, f"[CQ:at,qq={msg_event().sender.id}] ")
         if OWNER_FLAG in output:
             output = output.replace(OWNER_FLAG, f"[CQ:at,qq={BOT_INFO.owner}] ")
-        output = output if len(output) > 0 else None
-        if output is not None:
+        if output != "":
             if random() < self.special_prob:
                 output = "[恭喜你触发了这条千分之一概率的隐藏回复]"
         return output
@@ -79,7 +78,7 @@ class WordlibLoader(Plugin):
     async def make_reply(self) -> None:
         keys = self.get_keys()
         output = self.get_random_reply(keys)
-        if output:
+        if len(output):
             await send(output, cq_str=True)
 
     @words_info

@@ -2,6 +2,7 @@ import asyncio as aio
 import importlib
 import json
 from random import randint
+from typing import Callable, cast
 
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule
@@ -22,9 +23,15 @@ from melobot import (
     send_reply,
     session,
 )
-from melobot.models import BotAction, image_msg, reply_msg, text_msg, touch_msg
+from melobot.models import (
+    BotAction,
+    ResponseEvent,
+    image_msg,
+    reply_msg,
+    text_msg,
+    touch_msg,
+)
 from melobot.types import SessionHupTimeout
-from melobot.types.typing import AsyncFunc
 
 from ..env import OWNER_CHECKER, PARSER_GEN, SU_CHECKER
 from ..public_utils import base64_encode
@@ -95,6 +102,7 @@ class TestUtils(Plugin):
         sec = randint(*self.async_t)
         id = str(get_id())[-6:]
         resp = await send(f"异步测试开始。时长：{sec}s，识别标记：{id}", wait=True)
+        resp = cast(ResponseEvent, resp)
         await aio.sleep(sec)
         await send(
             [
@@ -114,6 +122,7 @@ class TestUtils(Plugin):
             f"会话测试开始。识别标记：{qid}，模拟间隔：{self.session_simulate_t}s。输入 stop 可停止本次会话测试",
             wait=True,
         )
+        resp = cast(ResponseEvent, resp)
         start_msg_id = resp.data["message_id"]
         await send_hup(
             f"是否启用时长为 {self.session_overtime_t}s 的会话超时功能？（y/n）"
@@ -190,7 +199,7 @@ class TestUtils(Plugin):
         debug_action.mark("TestUtils", "io-debug")
         await session.custom_action(debug_action)
 
-    async def format_send(self, send_func: AsyncFunc[None], s: str) -> None:
+    async def format_send(self, send_func: Callable, s: str) -> None:
         if len(s) <= 300:
             await send_func(s)
         elif len(s) > 10000:
