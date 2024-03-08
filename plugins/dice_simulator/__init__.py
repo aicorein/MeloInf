@@ -1,5 +1,5 @@
 from melobot import ArgFormatter as Format
-from melobot import Plugin, PluginBus, finish, send, send_reply, session
+from melobot import Plugin, PluginBus, finish, msg_args, send, send_reply
 from melobot.models import image_msg
 
 from ..env import COMMON_CHECKER, PARSER_GEN
@@ -61,7 +61,7 @@ class DiceSimulator(Plugin):
 
     @dice_r
     async def dice_r(self) -> None:
-        s = session.args.pop(0)
+        s = msg_args().pop(0)
         try:
             output = r_gen(s)
             await send_reply(output)
@@ -71,7 +71,7 @@ class DiceSimulator(Plugin):
 
     @dice_draw
     async def dice_draw(self) -> None:
-        deck_name, freq = session.args
+        deck_name, freq = msg_args()
         if deck_name is None:
             output = "当前可用牌堆：\n ● " + "\n ● ".join(self.cmd_desks_map.keys())
             output += "\n本功能牌堆来源于：\n ● dice 论坛\n ● Github: @Vescrity"

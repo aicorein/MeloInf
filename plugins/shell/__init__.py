@@ -8,25 +8,27 @@ import psutil
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
 from melobot import (
-    BotLife,
     CmdParser,
+    MetaInfo,
     Plugin,
     PluginBus,
     bot,
     finish,
-    get_metainfo,
+    image_msg,
+    msg_args,
     msg_event,
     msg_text,
+    pause,
     send,
-    session,
+    send_custom_msg,
 )
-from melobot.models import image_msg
-from melobot.types import BotException, CQMsgDict
+from melobot.models import CQMsgDict
+from melobot.types.exceptions import BotException
 
 from ..env import OWNER_CHECKER
 from ..public_utils import base64_encode
 
-META_INFO = get_metainfo()
+META_INFO = MetaInfo()
 shell = Plugin.on_message(
     checker=OWNER_CHECKER,
     session_rule=AttrRule("sender", "id"),
@@ -57,7 +59,7 @@ class ShellManager(Plugin):
         self._buf: list[tuple[float, str]] = []
         self._cache_time = 0.3
 
-    @bot.on(BotLife.LOADED)
+    @bot.on_all_loaded()
     async def open_shell(self) -> None:
         self.shell = await aio.create_subprocess_exec(
             self.executable,
@@ -65,7 +67,7 @@ class ShellManager(Plugin):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=str(self.ROOT),
+            cwd=str(self.PATH),
         )
         if (
             self.shell.stdout is None
@@ -83,7 +85,7 @@ class ShellManager(Plugin):
         ]
         self.LOGGER.info("IShell 服务已开启")
 
-    @bot.on(BotLife.BEFORE_STOP)
+    @bot.on_before_stop()
     async def close_shell(self) -> None:
         for t in self.tasks:
             t.cancel()
@@ -134,7 +136,7 @@ class ShellManager(Plugin):
                             msg = image_msg(b64_data)
                         else:
                             msg = s
-                        await session.custom_send(msg, p[1], p[0], p[2])
+                        await send_custom_msg(msg, p[1], p[0], p[2])
                 await aio.sleep(0.2)
         except aio.CancelledError:
             pass
@@ -161,7 +163,7 @@ class ShellManager(Plugin):
 
     @shell
     async def run_in_shell(self) -> None:
-        cmd = session.args.pop(0)
+        cmd = msg_args().pop(0)
         if cmd is None:
             event = msg_event()
             self.pointer = (
@@ -177,14 +179,14 @@ class ShellManager(Plugin):
             )
             await send(tip)
             while True:
-                await session.hup()
+                await pause()
                 await self.execute(msg_text())
         else:
             p = await aio.create_subprocess_shell(
                 cmd,
                 stderr=aio.subprocess.PIPE,
                 stdout=aio.subprocess.PIPE,
-                cwd=str(self.ROOT),
+                cwd=str(self.PATH),
             )
             out, err = await p.communicate()
             if err == b"":

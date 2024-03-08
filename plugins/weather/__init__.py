@@ -1,5 +1,5 @@
 from melobot import ArgFormatter as Format
-from melobot import Plugin, finish, lock, send, send_reply, session
+from melobot import Plugin, finish, lock, msg_args, send, send_reply
 from melobot.models import image_msg
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
@@ -41,7 +41,7 @@ class WeatherUtils(Plugin):
     @weather
     @lock(lambda: send("请等待前一个天气获取任务完成，稍后再试~"))
     async def weather(self) -> None:
-        city, days = session.args
+        city, days = msg_args()
         text_box = []
         min_temps, max_temps = [], []
 

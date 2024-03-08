@@ -1,17 +1,17 @@
 import io
 from typing import Tuple
 
-from melobot import BotLife, Plugin, PluginBus, bot, session
-from melobot.models import text_msg
+from melobot import Plugin, PluginBus, bot
+from melobot import text_msg, get_login_info
 
 from .utils import txt2img, wrap_s
 
 
 class BaseUtils(Plugin):
-    __share__ = ["bot_name", "bot_id"]
-
     def __init__(self) -> None:
         super().__init__()
+        self.SHARES.extend(["bot_name", "bot_id"])
+
         self.bot_name = None
         self.bot_id = None
 
@@ -40,9 +40,9 @@ class BaseUtils(Plugin):
         txt_list = list(map(lambda x: x.strip("\n"), wrap_s(s, one_msg_len)))
         return [text_msg(txt) for txt in txt_list]
 
-    @bot.on(BotLife.CONNECTED)
+    @bot.on_connected()
     async def get_login_info(self) -> None:
-        resp = await session.get_login_info()
+        resp = await get_login_info()
         if resp.is_ok():
             self.bot_name = resp.data["nickname"]
             self.bot_id = resp.data["user_id"]

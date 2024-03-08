@@ -2,7 +2,7 @@ import hashlib
 from typing import Tuple
 
 from melobot import send_reply
-from melobot.types import BotException
+from melobot.types.exceptions import BotException
 
 from ..env import BOT_INFO
 from ..public_utils import async_http, get_headers

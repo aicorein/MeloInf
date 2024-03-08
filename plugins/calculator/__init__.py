@@ -1,5 +1,5 @@
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, PluginBus, send_reply, session
+from melobot import CmdParser, Plugin, PluginBus, msg_args, send_reply
 
 from ..env import COMMON_CHECKER
 
@@ -26,7 +26,7 @@ class Calculator(Plugin):
 
     @calc
     async def calc(self) -> None:
-        expression = session.args.pop(0)
+        expression = msg_args().pop(0)
         output = await PluginBus.emit(
             "CodeCompiler", "do_calc", expression, 15, "py3", wait=True, forward=True
         )

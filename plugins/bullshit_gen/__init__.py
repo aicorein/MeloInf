@@ -3,7 +3,7 @@ import random
 import string
 
 from melobot import ArgFormatter as Format
-from melobot import Plugin, send, session
+from melobot import Plugin, msg_args, send
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from .gen import Generator
@@ -34,7 +34,7 @@ class BullshitGen(Plugin):
 
     @bullshit_gen
     async def bullshit_gen(self) -> None:
-        theme = session.args.pop(0)
+        theme = msg_args().pop(0)
         output = Generator(theme, self.length).generate()
         await send(output)
 

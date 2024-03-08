@@ -3,14 +3,15 @@ from melobot import (
     Plugin,
     PluginStore,
     cooldown,
+    custom_msg_node,
     finish,
     msg_event,
+    pause,
     send,
+    send_forward,
     send_reply,
-    session,
 )
-from melobot.models import custom_msg_node
-from melobot.types import SessionHupTimeout
+from melobot.types.exceptions import SessionHupTimeout
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
 from ..public_utils import async_http, get_headers
@@ -41,7 +42,7 @@ class AnimeSearcher(Plugin):
     async def anime_recogize(self) -> None:
         await send("【欢迎使用识番功能】\n现在请发送番剧截图")
         try:
-            await session.hup(overtime=20)
+            await pause(overtime=20)
         except SessionHupTimeout:
             await send_reply("等待发送图片超时，识番任务已取消")
             return
@@ -81,4 +82,4 @@ class AnimeSearcher(Plugin):
                 outputs,
             )
         )
-        await session.send_forward(nodes)
+        await send_forward(nodes)

@@ -8,30 +8,32 @@ from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule
 from melobot import AttrSessionRule as AttrRule
 from melobot import (
-    BotLife,
+    BotAction,
     Plugin,
     PluginBus,
     PluginStore,
+    ResponseEvent,
     bot,
     finish,
     get_id,
+    image_msg,
+    msg_args,
     msg_event,
     msg_text,
     notice_event,
+    pause,
+    reply_msg,
     send,
+    send_custom_msg,
     send_hup,
     send_reply,
     session,
-)
-from melobot.models import (
-    BotAction,
-    ResponseEvent,
-    image_msg,
-    reply_msg,
+    take_custom_action,
     text_msg,
+    to_cq_str,
     touch_msg,
 )
-from melobot.types import SessionHupTimeout
+from melobot.types.exceptions import SessionHupTimeout
 
 from ..env import OWNER_CHECKER, PARSER_GEN, SU_CHECKER
 from ..public_utils import base64_encode
@@ -140,13 +142,11 @@ class TestUtils(Plugin):
                 eid_list_s = f"[{', '.join(['0x%x' %id(e) for e in session.events])}]"
                 if overtime:
                     await send_hup(
-                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}\n",
+                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}",
                         overtime=self.session_overtime_t,
                     )
                 else:
-                    await send_hup(
-                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}\n"
-                    )
+                    await send_hup(f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}")
             except SessionHupTimeout:
                 self.test_cnt += 1
                 await finish(
@@ -166,15 +166,15 @@ class TestUtils(Plugin):
 
     @echo
     async def echo(self) -> None:
-        content = session.args.pop(0)
-        await send(content, cq_str=True)
+        output_cq = to_cq_str(msg_event().content)[6:]
+        await send(output_cq, cq_str=True)
 
     @io_debug
     async def io_debug(self) -> None:
-        status = session.args.pop(0)
+        status = msg_args().pop(0)
         self.io_debug_flag = status
 
-    @bot.on(BotLife.ACTION_PRESEND)
+    @bot.on_action_presend()
     async def _io_debug(self, action: BotAction) -> None:
         if action.flag_check("TestUtils", "io-debug"):
             return
@@ -189,7 +189,7 @@ class TestUtils(Plugin):
         output = f"event:\n{e_str}\n\naction:\n{a_str}"
         if len(output) <= 10000:
             data = await PluginBus.emit(
-                "BaseUtils", "txt2img", output, 100, 16, wait=True
+                "BaseUtils", "txt2img", output, 50, 16, wait=True
             )
             data = base64_encode(data)
             debug_action.params["message"] = [image_msg(data)]
@@ -197,7 +197,7 @@ class TestUtils(Plugin):
             debug_action.params["message"] = [text_msg("[调试输出过长，请使用调试器]")]
         debug_action.resp_id = None
         debug_action.mark("TestUtils", "io-debug")
-        await session.custom_action(debug_action)
+        await take_custom_action(debug_action)
 
     async def format_send(self, send_func: Callable, s: str) -> None:
         if len(s) <= 300:
@@ -221,13 +221,13 @@ class TestUtils(Plugin):
         imports = {}
         var_map = {"bot": bot.__origin__}
         while True:
-            await session.hup()
+            await pause()
             match msg_text():
                 case "$e$":
                     await finish("已退出核心调试状态")
                 case "$i$":
                     await send("【开始导入在调试时可用的模块】\n$e$ 退出导入操作")
-                    await session.hup()
+                    await pause()
                     try:
                         text = msg_text()
                         if text == "$e$":
@@ -247,7 +247,7 @@ class TestUtils(Plugin):
                         await send(
                             f"【输入修改后的值：】\n$e$ 退出修改操作\n当前指向对象：{pointer}"
                         )
-                        await session.hup()
+                        await pause()
                         try:
                             text = msg_text()
                             if text == "$e$":
@@ -279,10 +279,9 @@ class TestUtils(Plugin):
         if event.notice_user_id != self.bot_id.val:
             return
         poke_qid = event.notice_operator_id
-        await session.custom_send(
+        await send_custom_msg(
             touch_msg(poke_qid),
             not event.is_group(),
             event.notice_operator_id,
             event.notice_group_id if event.is_group() else None,
-            waitResp=True,
         )

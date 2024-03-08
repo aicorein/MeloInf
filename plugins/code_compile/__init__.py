@@ -1,8 +1,8 @@
 from typing import Dict
 
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, PluginBus, send_reply, session
-from melobot.types import BotException
+from melobot import CmdParser, Plugin, PluginBus, msg_args, send_reply
+from melobot.types.exceptions import BotException
 
 from ..env import BOT_INFO, COMMON_CHECKER
 from ..public_utils import async_http, get_headers
@@ -76,7 +76,7 @@ class CodeCompiler(Plugin):
 
     @code_c
     async def codec(self) -> None:
-        lang, code = session.args
+        lang, code = msg_args()
         match lang:
             case "cpp":
                 lang_id, ext = 7, "cpp"

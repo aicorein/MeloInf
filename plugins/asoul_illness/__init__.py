@@ -3,7 +3,7 @@ from random import choice
 from typing import Dict, List
 
 from melobot import ArgFormatter as Format
-from melobot import Plugin, get_cq_text, send, session, this_dir
+from melobot import Plugin, msg_args, send, this_dir
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 
@@ -33,8 +33,7 @@ class AsoulIllness(Plugin):
 
     @be_ill
     async def be_ill(self) -> None:
-        target = session.args.pop(0)
-        target = get_cq_text(target)
+        target = msg_args().pop(0)
         text_pair = choice(self.data)
         text, person = text_pair["text"], text_pair["person"]
         text = text.replace(person, target)

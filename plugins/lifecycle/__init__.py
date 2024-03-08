@@ -4,23 +4,13 @@ from typing import List
 
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
-from melobot import (
-    BotLife,
-    Plugin,
-    PriorLevel,
-    User,
-    bot,
-    get_metainfo,
-    msg_event,
-    send,
-    send_reply,
-    session,
-)
+from melobot import MetaInfo, Plugin, PriorLevel, User, bot, msg_event, send, send_reply
+from melobot import msg_args, send_custom_msg
 
 from ..env import BOT_INFO, CHECKER_GEN, COMMON_CHECKER, OWNER_CHECKER, PARSER_GEN
 from .recovery import read_rec, save_rec
 
-META_INFO = get_metainfo()
+META_INFO = MetaInfo()
 BOT_NICKNAME = BOT_INFO.bot_nickname
 info = Plugin.on_message(
     parser=PARSER_GEN.gen(target=["info", "信息"]), checker=COMMON_CHECKER
@@ -50,15 +40,17 @@ life = Plugin.on_message(
 
 
 class LifeCycleUtils(Plugin):
-    __share__ = [
-        "start_moment",
-        "format_start_moment",
-        "running_time",
-        "format_running_time",
-    ]
-
     def __init__(self) -> None:
         super().__init__()
+        self.SHARES.extend(
+            [
+                "start_moment",
+                "format_start_moment",
+                "running_time",
+                "format_running_time",
+            ]
+        )
+
         self.rec_name = "restart.rec"
         self.start_moment = time.time()
         self.format_start_moment = dt.datetime.now().strftime("%m-%d %H:%M:%S")
@@ -80,12 +72,12 @@ class LifeCycleUtils(Plugin):
         time_str_list = format_nums(days, hours, mins, secs)
         return ":".join(time_str_list)
 
-    @bot.on(BotLife.CONNECTED)
+    @bot.on_connected()
     async def restart_wake(self) -> None:
-        res = read_rec(str(self.ROOT), self.rec_name)
+        res = read_rec(str(self.PATH), self.rec_name)
         if res is not None:
             sender_id, is_private, group_id = res
-            await session.custom_send(
+            await send_custom_msg(
                 f"{BOT_NICKNAME} 重启完成~", is_private, sender_id, group_id
             )
             self.LOGGER.info("本次启动为指令触发的重启，已回复重启成功消息")
@@ -122,19 +114,20 @@ class LifeCycleUtils(Plugin):
 
     @status
     async def status(self) -> None:
+        all_plugins = bot.get_plugins()
         output = " ● 运行模式：{}\n ● 启动时间：{}\n ● 已运行：{}\n ● 全局冷却时间：{}s\n ● 已加载插件：{}".format(
             "模块运行模式" if bot.is_module_run() else "脚本运行模式",
             self.format_start_moment,
             self.format_running_time,
-            bot.config.cooldown_time,
-            ", ".join([p.id for p in bot.plugins.values()])
-            + f"（{len(bot.plugins)} 个）",
+            bot.get_config().cooldown_time,
+            ", ".join([p.id for p in all_plugins.values()])
+            + f"（{len(all_plugins)} 个）",
         )
         await send(output)
 
     @life
     async def life(self) -> None:
-        option = session.args.pop(0)
+        option = msg_args().pop(0)
         match option:
             case "on":
                 if bot.is_activate:
@@ -152,7 +145,7 @@ class LifeCycleUtils(Plugin):
             case "restart" | "re":
                 if bot.is_module_run():
                     await send(f"{BOT_NICKNAME} 正在准备重启...")
-                    save_rec(str(self.ROOT), self.rec_name)
+                    save_rec(str(self.PATH), self.rec_name)
                     await bot.restart()
                 else:
                     await send(

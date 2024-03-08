@@ -1,10 +1,10 @@
 from random import choice, random
-from typing import List, cast
+from typing import List
 
 from melobot import ArgFormatter as Format
 from melobot import CmdParser, Plugin
 from melobot import PluginStore as Store
-from melobot import lock, msg_event, msg_text, send, send_reply, session
+from melobot import lock, msg_args, msg_event, msg_text, send, send_reply
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, WHITE_CHECKER
 from ..public_utils import remove_ask_punctuation, remove_punctuation
@@ -93,7 +93,7 @@ class WordlibLoader(Plugin):
         )
     )
     async def teach_pair(self) -> None:
-        ask, ans = session.args
+        ask, ans = msg_args()
         ask = remove_ask_punctuation(ask)
         res = add_pair(ask, ans)
         if res:

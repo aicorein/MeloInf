@@ -1,6 +1,6 @@
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, send_reply, session
-from melobot.types import BotException
+from melobot import CmdParser, Plugin, msg_args, send_reply
+from melobot.types.exceptions import BotException
 
 from ..env import COMMON_CHECKER
 from .utils import get_translated_text
@@ -36,7 +36,7 @@ class Translator(Plugin):
 
     @translate
     async def translate(self) -> None:
-        text, target = session.args
+        text, target = msg_args()
         try:
             _from, to, translated = await get_translated_text(text, target)
             output = "【模式 {} -> {}】\n{}".format(_from, to, translated)

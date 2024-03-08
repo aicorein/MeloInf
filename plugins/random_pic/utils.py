@@ -1,7 +1,7 @@
 import asyncio as aio
 import json
 
-from melobot.types import BotException
+from melobot.types.exceptions import BotException
 
 from ..public_utils import async_http, get_headers
 
