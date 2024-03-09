@@ -1,8 +1,9 @@
-from typing import List, Tuple
+from typing import Any, Callable, Coroutine, List, Tuple
 
 import toml
 
 from melobot import CmdParserGen, MsgCheckerGen, User, this_dir
+from melobot.types import BotEvent
 
 settings_path = this_dir("./settings.toml")
 with open(settings_path, encoding="utf-8") as fp:
@@ -49,7 +50,48 @@ CHECKER_GEN = MsgCheckerGen(
 )
 PARSER_GEN = CmdParserGen(BOT_INFO.uni_cmd_start, BOT_INFO.uni_cmd_sep)
 
-OWNER_CHECKER = CHECKER_GEN.gen_group(User.OWNER) | CHECKER_GEN.gen_private(User.OWNER)
-SU_CHECKER = CHECKER_GEN.gen_group(User.SU) | CHECKER_GEN.gen_private(User.SU)
-WHITE_CHECKER = CHECKER_GEN.gen_group(User.WHITE) | CHECKER_GEN.gen_private(User.WHITE)
+
+def _auto_fill(checker, ok_cb, fail_cb):
+    if ok_cb is not None:
+        checker._fill_ok_cb(ok_cb)
+    if fail_cb is not None:
+        checker._fill_fail_cb(fail_cb)
+
+
+def get_owner_checker(
+    ok_cb: Callable[[], Coroutine[Any, Any, None]] = None,
+    fail_cb: Callable[[], Coroutine[Any, Any, None]] = None,
+):
+    """
+    获得一个 owner 级别的权限检查器
+    """
+    checker = CHECKER_GEN.gen_group(User.OWNER) | CHECKER_GEN.gen_private(User.OWNER)
+    _auto_fill(checker, ok_cb, fail_cb)
+    return checker
+
+
+def get_su_checker(
+    ok_cb: Callable[[], Coroutine[Any, Any, None]] = None,
+    fail_cb: Callable[[], Coroutine[Any, Any, None]] = None,
+):
+    """
+    获得一个 superuser 级别的权限检查器
+    """
+    checker = CHECKER_GEN.gen_group(User.SU) | CHECKER_GEN.gen_private(User.SU)
+    _auto_fill(checker, ok_cb, fail_cb)
+    return checker
+
+
+def get_white_checker(
+    ok_cb: Callable[[], Coroutine[Any, Any, None]] = None,
+    fail_cb: Callable[[], Coroutine[Any, Any, None]] = None,
+):
+    """
+    获得一个 white_user 级别的权限检查器
+    """
+    checker = CHECKER_GEN.gen_group(User.WHITE) | CHECKER_GEN.gen_private(User.WHITE)
+    _auto_fill(checker, ok_cb, fail_cb)
+    return checker
+
+
 COMMON_CHECKER = CHECKER_GEN.gen_group() | CHECKER_GEN.gen_private()

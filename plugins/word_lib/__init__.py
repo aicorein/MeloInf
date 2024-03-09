@@ -6,7 +6,7 @@ from melobot import CmdParser, Plugin
 from melobot import PluginStore as Store
 from melobot import lock, msg_args, msg_event, msg_text, send, send_reply
 
-from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, WHITE_CHECKER
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, get_white_checker
 from ..public_utils import remove_ask_punctuation, remove_punctuation
 from .dict import BOT_FLAG, OWNER_FLAG, SENDER_FLAG, WORD_DICT, add_pair
 
@@ -15,7 +15,7 @@ words_info = Plugin.on_message(
     checker=COMMON_CHECKER, parser=PARSER_GEN.gen(["w-info", "词库信息"])
 )
 teach = Plugin.on_message(
-    checker=WHITE_CHECKER,
+    checker=get_white_checker(fail_cb=lambda: send_reply("你无权使用【词条扩充】功能")),
     parser=CmdParser(
         cmd_start="*",
         cmd_sep="##",

@@ -9,6 +9,7 @@ from melobot import AttrSessionRule
 from melobot import AttrSessionRule as AttrRule
 from melobot import (
     BotAction,
+    MessageEvent,
     Plugin,
     PluginBus,
     PluginStore,
@@ -35,25 +36,26 @@ from melobot import (
 )
 from melobot.types.exceptions import SessionHupTimeout
 
-from ..env import OWNER_CHECKER, PARSER_GEN, SU_CHECKER
+from ..env import PARSER_GEN, get_owner_checker, get_su_checker
 from ..public_utils import base64_encode
 
 atest = Plugin.on_message(
-    checker=SU_CHECKER,
+    checker=get_su_checker(fail_cb=lambda: send_reply("你无权使用【异步测试】功能")),
     parser=PARSER_GEN.gen(target=["异步测试", "atest", "async-test"]),
 )
 test_n = Plugin.on_message(
-    checker=SU_CHECKER, parser=PARSER_GEN.gen(target=["测试统计", "testn", "test-stat"])
+    checker=get_su_checker(fail_cb=lambda: send_reply("你无权使用【测试统计】功能")),
+    parser=PARSER_GEN.gen(target=["测试统计", "testn", "test-stat"]),
 )
 stest = Plugin.on_message(
-    checker=SU_CHECKER,
+    checker=get_su_checker(fail_cb=lambda: send_reply("你无权使用【会话测试】功能")),
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
     conflict_cb=lambda: send("其他的 session 测试进行中...稍后再试"),
     parser=PARSER_GEN.gen(target=["会话测试", "stest", "session-test"]),
 )
 io_debug = Plugin.on_message(
-    checker=SU_CHECKER,
+    checker=get_su_checker(fail_cb=lambda: send_reply("你无权使用【io 调试】功能")),
     parser=PARSER_GEN.gen(
         target=["io调试", "io-debug"],
         formatters=[
@@ -66,14 +68,14 @@ io_debug = Plugin.on_message(
     ),
 )
 core_debug = Plugin.on_message(
-    checker=OWNER_CHECKER,
+    checker=get_owner_checker(fail_cb=lambda: send_reply("你无权使用【核心调试】功能")),
     parser=PARSER_GEN.gen(target=["核心调试", "core-debug"]),
     session_rule=AttrSessionRule("sender", "id"),
     direct_rouse=True,
     conflict_cb=lambda: send("已进入核心调试状态， 拒绝重复进入该状态"),
 )
 echo = Plugin.on_message(
-    checker=SU_CHECKER,
+    checker=get_su_checker(fail_cb=lambda: send_reply("你无权使用【复读】功能")),
     parser=PARSER_GEN.gen(
         target=["复读", "echo"],
         formatters=[
@@ -89,11 +91,23 @@ echo = Plugin.on_message(
 poke = Plugin.on_notice(type="poke")
 
 
+def set_event_records() -> None:
+    session.store_add("EVENTS", [])
+
+
+def get_event_records() -> list[MessageEvent]:
+    return session.store_get("EVENTS")
+
+
+def append_event_records() -> None:
+    get_event_records().append(msg_event())
+
+
 class TestUtils(Plugin):
     def __init__(self) -> None:
         super().__init__()
         self.async_t = (1, 6)
-        self.session_simulate_t = 1.5
+        self.session_simulate_t = 1
         self.session_overtime_t = 10
         self.test_cnt = 0
         self.bot_id = PluginStore.get("BaseUtils", "bot_id")
@@ -116,7 +130,6 @@ class TestUtils(Plugin):
 
     @stest
     async def sessoin_test(self) -> None:
-        await aio.sleep(self.session_simulate_t)
         cnt = 0
         overtime = False
         qid = msg_event().sender.id
@@ -126,9 +139,13 @@ class TestUtils(Plugin):
         )
         resp = cast(ResponseEvent, resp)
         start_msg_id = resp.data["message_id"]
+
+        set_event_records()
+        append_event_records()
         await send_hup(
             f"是否启用时长为 {self.session_overtime_t}s 的会话超时功能？（y/n）"
         )
+        append_event_records()
         if msg_text() == "y":
             overtime = True
         cnt += 1
@@ -139,7 +156,7 @@ class TestUtils(Plugin):
             cnt += 1
             await aio.sleep(self.session_simulate_t)
             try:
-                eid_list_s = f"[{', '.join(['0x%x' %id(e) for e in session.events])}]"
+                eid_list_s = f"[{', '.join(['0x%x' %id(e) for e in get_event_records()])}]"
                 if overtime:
                     await send_hup(
                         f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}",
@@ -147,6 +164,7 @@ class TestUtils(Plugin):
                     )
                 else:
                     await send_hup(f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}")
+                append_event_records()
             except SessionHupTimeout:
                 self.test_cnt += 1
                 await finish(

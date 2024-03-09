@@ -21,16 +21,17 @@ from melobot import (
     pause,
     send,
     send_custom_msg,
+    send_reply,
 )
 from melobot.models import CQMsgDict
 from melobot.types.exceptions import BotException
 
-from ..env import OWNER_CHECKER
+from ..env import get_owner_checker
 from ..public_utils import base64_encode
 
 META_INFO = MetaInfo()
 shell = Plugin.on_message(
-    checker=OWNER_CHECKER,
+    checker=get_owner_checker(fail_cb=lambda: send_reply("你无权使用【命令行】功能")),
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
     conflict_cb=lambda: send("已在运行交互式 shell"),

@@ -1,8 +1,7 @@
 import io
 from typing import Tuple
 
-from melobot import Plugin, PluginBus, bot
-from melobot import text_msg, get_login_info
+from melobot import Plugin, PluginBus, bot, get_login_info, text_msg
 
 from .utils import txt2img, wrap_s
 

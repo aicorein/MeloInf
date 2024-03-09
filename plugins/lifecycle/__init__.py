@@ -4,10 +4,20 @@ from typing import List
 
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
-from melobot import MetaInfo, Plugin, PriorLevel, User, bot, msg_event, send, send_reply
-from melobot import msg_args, send_custom_msg
+from melobot import (
+    MetaInfo,
+    Plugin,
+    PriorLevel,
+    User,
+    bot,
+    msg_args,
+    msg_event,
+    send,
+    send_custom_msg,
+    send_reply,
+)
 
-from ..env import BOT_INFO, CHECKER_GEN, COMMON_CHECKER, OWNER_CHECKER, PARSER_GEN
+from ..env import BOT_INFO, CHECKER_GEN, COMMON_CHECKER, PARSER_GEN, get_owner_checker
 from .recovery import read_rec, save_rec
 
 META_INFO = MetaInfo()
@@ -22,7 +32,9 @@ status = Plugin.on_message(
     parser=PARSER_GEN.gen(target=["status", "状态"]), checker=COMMON_CHECKER
 )
 life = Plugin.on_message(
-    checker=OWNER_CHECKER,
+    checker=get_owner_checker(
+        fail_cb=lambda: send_reply("你无权使用【生命状态设置】功能")
+    ),
     session_rule=AttrRule("sender", "id"),
     conflict_cb=lambda: send("工作状态切换中...稍后再试~"),
     priority=PriorLevel.MIN,
