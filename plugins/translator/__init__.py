@@ -1,5 +1,5 @@
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, msg_args, send_reply
+from melobot import CmdParser, Plugin, msg_args, send_reply, timelimit
 from melobot.types.exceptions import BotException
 
 from ..env import COMMON_CHECKER
@@ -7,8 +7,6 @@ from .utils import get_translated_text
 
 translate = Plugin.on_message(
     checker=COMMON_CHECKER,
-    timeout=25,
-    overtime_cb=lambda: send_reply("翻译结果获取超时，请稍候再试..."),
     parser=CmdParser(
         cmd_start="*",
         cmd_sep="#",
@@ -35,6 +33,7 @@ class Translator(Plugin):
         super().__init__()
 
     @translate
+    @timelimit(lambda: send_reply("翻译结果获取超时，请稍候再试..."), timeout=25)
     async def translate(self) -> None:
         text, target = msg_args()
         try:

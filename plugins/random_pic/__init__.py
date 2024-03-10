@@ -1,6 +1,6 @@
 from random import choice, randint
 
-from melobot import Plugin, cooldown, send, send_reply
+from melobot import Plugin, cooldown, send, send_reply, timelimit
 from melobot.models import image_msg
 
 from ..env import COMMON_CHECKER, PARSER_GEN
@@ -8,10 +8,7 @@ from ..public_utils import async_http, base64_encode, get_headers
 from .utils import json_pic1
 
 rpic = Plugin.on_message(
-    parser=PARSER_GEN.gen(target=["随机图", "rpic"]),
-    checker=COMMON_CHECKER,
-    timeout=25,
-    overtime_cb=lambda: send_reply("图片获取超时，请稍候再试..."),
+    parser=PARSER_GEN.gen(target=["随机图", "rpic"]), checker=COMMON_CHECKER
 )
 
 
@@ -41,7 +38,11 @@ class RandomPicGen(Plugin):
         lambda t: send("图片获取功能冷却中，剩余：%.2fs" % t),
         interval=10,
     )
+    @timelimit(lambda: send_reply("图片获取超时，请稍候再试..."), timeout=5)
     async def random_pic(self) -> None:
+        import asyncio as aio
+
+        await aio.sleep(6)
         url = await self.get_pic_url()
         async with async_http(url=url, method="get", headers=get_headers()) as resp:
             if resp.status != 200:

@@ -3,7 +3,6 @@ from typing import Any, Callable, Coroutine, List, Tuple
 import toml
 
 from melobot import CmdParserGen, MsgCheckerGen, User, this_dir
-from melobot.types import BotEvent
 
 settings_path = this_dir("./settings.toml")
 with open(settings_path, encoding="utf-8") as fp:

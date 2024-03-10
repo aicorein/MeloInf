@@ -9,7 +9,7 @@ MAX_CONN_TRY = -1
 # websocket 连接重试的间隔时间（-1 为无间隔）
 CONN_TRY_INTERVAL = 2
 # 全局日志等级（DEBUG, INFO, WARNING, ERROR, CRITICAL）
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 # 消息发送冷却时间（防止发送消息过快被风控）
 COOLDOWN_TIME = 0.25
 # 日志输出目录（会在该目录初始化 app.log 文件）

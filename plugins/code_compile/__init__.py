@@ -1,7 +1,7 @@
 from typing import Dict
 
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, PluginBus, msg_args, send_reply
+from melobot import CmdParser, Plugin, PluginBus, msg_args, send_reply, timelimit
 from melobot.types.exceptions import BotException
 
 from ..env import BOT_INFO, COMMON_CHECKER
@@ -9,8 +9,6 @@ from ..public_utils import async_http, get_headers
 
 code_c = Plugin.on_message(
     checker=COMMON_CHECKER,
-    timeout=25,
-    overtime_cb=lambda: send_reply("代码编译结果获取超时，请稍候再试..."),
     parser=CmdParser(
         cmd_start="*",
         cmd_sep="$",
@@ -75,6 +73,7 @@ class CodeCompiler(Plugin):
                 raise BotException(f"远端编译请求异常：{e.__class__.__name__} {e}")
 
     @code_c
+    @timelimit(lambda: send_reply("代码编译结果获取超时，请稍候再试..."), timeout=25)
     async def codec(self) -> None:
         lang, code = msg_args()
         match lang:

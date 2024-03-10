@@ -1,5 +1,5 @@
 from melobot import ArgFormatter as Format
-from melobot import Plugin, finish, lock, msg_args, send, send_reply
+from melobot import Plugin, finish, lock, msg_args, send, send_reply, timelimit
 from melobot.models import image_msg
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
@@ -8,8 +8,6 @@ from .make_fig import gen_weather_fig
 
 weather = Plugin.on_message(
     checker=COMMON_CHECKER,
-    timeout=25,
-    overtime_cb=lambda: send_reply("天气信息获取超时，请稍候再试..."),
     parser=PARSER_GEN.gen(
         target=["天气", "weather"],
         formatters=[
@@ -40,6 +38,7 @@ class WeatherUtils(Plugin):
 
     @weather
     @lock(lambda: send("请等待前一个天气获取任务完成，稍后再试~"))
+    @timelimit(lambda: send_reply("天气信息获取超时，请稍候再试..."), timeout=25)
     async def weather(self) -> None:
         city, days = msg_args()
         text_box = []
