@@ -1,5 +1,14 @@
 from melobot import ArgFormatter as Format
-from melobot import Plugin, finish, lock, msg_args, send, send_reply, timelimit
+from melobot import (
+    Plugin,
+    finish,
+    lock,
+    msg_args,
+    reply_finish,
+    send,
+    send_reply,
+    timelimit,
+)
 from melobot.models import image_msg
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
@@ -51,9 +60,10 @@ class WeatherUtils(Plugin):
             params={"location": city, "key": self.api_key},
         ) as resp:
             if resp.status != 200:
-                await send_reply("城市 id 查询失败...请稍后再试，或联系 bot 管理员解决")
                 self.LOGGER.error(f"请求失败：{resp.status}")
-                return
+                await reply_finish(
+                    "城市 id 查询失败...请稍后再试，或联系 bot 管理员解决"
+                )
             else:
                 res = await resp.json()
 
@@ -69,11 +79,10 @@ class WeatherUtils(Plugin):
             params={"location": city_id, "key": self.api_key},
         ) as resp:
             if resp.status != 200:
-                await send_reply(
+                self.LOGGER.error(f"请求失败：{resp.status}")
+                await reply_finish(
                     "城市当前天气获取失败...请稍后再试，或联系 bot 管理员解决"
                 )
-                self.LOGGER.error(f"请求失败：{resp.status}")
-                return
             else:
                 res = await resp.json()
 
@@ -86,11 +95,10 @@ class WeatherUtils(Plugin):
             params={"location": city_id, "key": self.api_key},
         ) as resp:
             if resp.status != 200:
-                await send_reply(
+                self.LOGGER.error(f"请求失败：{resp.status}")
+                await reply_finish(
                     "城市多天天气获取失败...请稍后再试，或联系 bot 管理员解决"
                 )
-                self.LOGGER.error(f"请求失败：{resp.status}")
-                return
             else:
                 res = await resp.json()
 

@@ -7,6 +7,7 @@ from melobot import AttrSessionRule as AttrRule
 from melobot import (
     MetaInfo,
     Plugin,
+    PluginStore,
     PriorLevel,
     User,
     bot,
@@ -51,6 +52,19 @@ life = Plugin.on_message(
 )
 
 
+bot_backend_str = """【bot backend】
+name：{}
+core：{}-{}
+proj：{}-{}
+src：{}
+python env：{}-{}"""
+
+bot_frontend_info = """【bot frontend】
+core：{}
+version：{}
+protocol：{}"""
+
+
 class LifeCycleUtils(Plugin):
     def __init__(self) -> None:
         super().__init__()
@@ -66,6 +80,10 @@ class LifeCycleUtils(Plugin):
         self.rec_name = "restart.rec"
         self.start_moment = time.time()
         self.format_start_moment = dt.datetime.now().strftime("%m-%d %H:%M:%S")
+        self.cq_app_name = PluginStore.get("BaseUtils", "cq_app_name")
+        self.cq_app_ver = PluginStore.get("BaseUtils", "cq_app_ver")
+        self.cq_protocol_ver = PluginStore.get("BaseUtils", "cq_protocol_ver")
+        self.cq_other_infos = PluginStore.get("BaseUtils", "cq_other_infos")
 
     @property
     def running_time(self) -> float:
@@ -96,16 +114,22 @@ class LifeCycleUtils(Plugin):
 
     @info
     async def info(self) -> None:
-        output = " ● bot 昵称：{}\n ● 内核：{} {}\n ● 内核项目地址：{}\n ● bot 项目：{} {}\n ● bot 项目地址：{}\n ● 运行平台：{}\n ● py 版本：{}".format(
+        output = bot_frontend_info.format(
+            self.cq_app_name.val, self.cq_app_ver.val, self.cq_protocol_ver.val
+        )
+        if len(self.cq_other_infos.val):
+            for k, v in self.cq_other_infos.val.items():
+                output += f"\n{k}：{v}"
+        await send(output)
+        output = bot_backend_str.format(
             BOT_NICKNAME,
             META_INFO.PROJ_NAME,
-            f"v{META_INFO.VER}",
-            META_INFO.PROJ_SRC,
+            META_INFO.VER,
             BOT_INFO.proj_name,
-            f"v{BOT_INFO.proj_ver}",
-            BOT_INFO.proj_src,
+            BOT_INFO.proj_ver,
+            BOT_INFO.proj_src.lstrip("https://"),
+            META_INFO.PY_VER.split("|")[0].strip(" "),
             META_INFO.PLATFORM,
-            META_INFO.PY_VER.split("|")[0],
         )
         await send(output)
 

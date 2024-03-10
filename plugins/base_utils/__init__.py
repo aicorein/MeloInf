@@ -1,7 +1,7 @@
 import io
 from typing import Tuple
 
-from melobot import Plugin, PluginBus, bot, get_login_info, text_msg
+from melobot import Plugin, PluginBus, bot, get_cq_version, get_login_info, text_msg
 
 from .utils import txt2img, wrap_s
 
@@ -9,10 +9,23 @@ from .utils import txt2img, wrap_s
 class BaseUtils(Plugin):
     def __init__(self) -> None:
         super().__init__()
-        self.SHARES.extend(["bot_name", "bot_id"])
+        self.SHARES.extend(
+            [
+                "bot_name",
+                "bot_id",
+                "cq_app_name",
+                "cq_app_ver",
+                "cq_protocol_ver",
+                "cq_other_infos",
+            ]
+        )
 
         self.bot_name = None
         self.bot_id = None
+        self.cq_app_name = None
+        self.cq_app_ver = None
+        self.cq_protocol_ver = None
+        self.cq_other_infos = None
 
     @PluginBus.on("BaseUtils", "txt2img")
     async def _txt2img(
@@ -48,3 +61,15 @@ class BaseUtils(Plugin):
             self.LOGGER.info("成功获得 bot 账号信息并存储")
         else:
             self.LOGGER.warning("获取 bot 账号信息失败")
+
+    @bot.on_connected()
+    async def get_version_info(self) -> None:
+        resp = await get_cq_version()
+        if resp.is_ok():
+            self.cq_app_name = resp.data.pop("app_name")
+            self.cq_app_ver = resp.data.pop("app_version")
+            self.cq_protocol_ver = resp.data.pop("protocol_version")
+            self.cq_other_infos = resp.data
+            self.LOGGER.info("成功获得 cq 前端实现的信息并存储")
+        else:
+            self.LOGGER.warning("获取 cq 前端实现的信息失败")

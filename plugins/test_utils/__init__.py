@@ -156,7 +156,9 @@ class TestUtils(Plugin):
             cnt += 1
             await aio.sleep(self.session_simulate_t)
             try:
-                eid_list_s = f"[{', '.join(['0x%x' %id(e) for e in get_event_records()])}]"
+                eid_list_s = (
+                    f"[{', '.join(['0x%x' %id(e) for e in get_event_records()])}]"
+                )
                 if overtime:
                     await send_hup(
                         f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}",

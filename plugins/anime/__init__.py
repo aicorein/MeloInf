@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from melobot import (
     AttrSessionRule,
     Plugin,
@@ -7,9 +9,9 @@ from melobot import (
     finish,
     msg_event,
     pause,
+    reply_finish,
     send,
-    send_forward,
-    send_reply,
+    send_forward
 )
 from melobot.types.exceptions import SessionHupTimeout
 
@@ -44,14 +46,12 @@ class AnimeSearcher(Plugin):
         try:
             await pause(overtime=20)
         except SessionHupTimeout:
-            await send_reply("等待发送图片超时，识番任务已取消")
-            return
+            await reply_finish("等待发送图片超时，识番任务已取消")
 
         params = msg_event().get_cq_params("image", "url")
         if len(params) <= 0:
-            await send_reply("发送的消息未识别到图片，识番功能已退出")
-            return
-        req_url = self.anime_search_url + params.pop(0)
+            await reply_finish("发送的消息未识别到图片，识番功能已退出")
+        req_url = self.anime_search_url + quote(params.pop(0))
         async with async_http(req_url, method="get", headers=get_headers()) as resp:
             if resp.status != 200:
                 self.LOGGER.error(f"识别番剧 api 返回结果异常，状态码：{resp.status}")
