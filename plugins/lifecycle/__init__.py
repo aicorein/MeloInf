@@ -1,6 +1,5 @@
 import datetime as dt
 import time
-from typing import List
 
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
@@ -128,7 +127,7 @@ class LifeCycleUtils(Plugin):
             BOT_INFO.proj_name,
             BOT_INFO.proj_ver,
             BOT_INFO.proj_src.lstrip("https://"),
-            META_INFO.PY_VER.split("|")[0].strip(" "),
+            f"{META_INFO.PY_INFO.major}.{META_INFO.PY_INFO.minor}.{META_INFO.PY_INFO.micro}",
             META_INFO.PLATFORM,
         )
         await send(output)

@@ -38,7 +38,7 @@ class RandomPicGen(Plugin):
         lambda t: send("图片获取功能冷却中，剩余：%.2fs" % t),
         interval=10,
     )
-    @timelimit(lambda: send_reply("图片获取超时，请稍候再试..."), timeout=5)
+    @timelimit(lambda: send_reply("图片获取超时，请稍候再试..."), timeout=25)
     async def random_pic(self) -> None:
         import asyncio as aio
 

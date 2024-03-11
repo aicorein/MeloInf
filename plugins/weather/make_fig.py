@@ -4,6 +4,8 @@ from math import ceil, floor
 from random import choice
 from typing import List, Tuple
 
+import matplotlib as mpl
+import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 from PIL import Image
 
@@ -12,7 +14,10 @@ from melobot import get_id, this_dir
 from ..env import BOT_INFO
 from ..public_utils import base64_encode
 
-plt.rcParams["font.family"] = BOT_INFO.figure_font
+fe = fm.FontEntry(fname=BOT_INFO.figure_font, name=BOT_INFO.figure_font.split("/")[-1])
+fm.fontManager.ttflist.insert(0, fe)
+mpl.rcParams["font.family"] = fe.name
+# plt.rcParams["font.family"] = BOT_INFO.figure_font
 plt.rcParams["axes.unicode_minus"] = False
 cwd = this_dir()
 bg_images: List[Image.Image] = []

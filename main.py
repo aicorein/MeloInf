@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append(r"E:\projects\Python\git-proj\melobot")
+sys.path.append("..")
 
 from melobot import MeloBot
 

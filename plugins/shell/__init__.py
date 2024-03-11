@@ -90,9 +90,10 @@ class ShellManager(Plugin):
     async def close_shell(self) -> None:
         for t in self.tasks:
             t.cancel()
-        self.shell.terminate()
-        await self.shell.wait()
-        self.LOGGER.info("Ishell 服务已正常关闭")
+        if self.shell.returncode is None:
+            self.shell.terminate()
+            await self.shell.wait()
+        self.LOGGER.info("Ishell 服务已关闭")
 
     async def output_watch(self, stream: aio.StreamReader) -> None:
         try:
@@ -109,6 +110,8 @@ class ShellManager(Plugin):
                 except Exception as e:
                     self.LOGGER.warning(f"IShell 输出转发遇到问题，警告：{e}")
         except aio.CancelledError:
+            pass
+        except KeyboardInterrupt:
             pass
 
     def intput_send(self, s: str) -> None:
