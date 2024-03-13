@@ -1,7 +1,7 @@
 from random import choice, randint
 
 from melobot import Plugin, cooldown, send, send_reply, timelimit
-from melobot.models import image_msg
+from melobot.models.cq import image_msg
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from ..public_utils import async_http, base64_encode, get_headers

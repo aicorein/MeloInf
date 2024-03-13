@@ -28,6 +28,6 @@ class Calculator(Plugin):
     async def calc(self) -> None:
         expression = msg_args().pop(0)
         output = await PluginBus.emit(
-            "CodeCompiler", "do_calc", expression, 15, "py3", wait=True, forward=True
+            "CodeCompiler", "do_calc", expression, 15, "py3", wait=True
         )
         await send_reply(output)

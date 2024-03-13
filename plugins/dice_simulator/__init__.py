@@ -1,6 +1,6 @@
 from melobot import ArgFormatter as Format
 from melobot import Plugin, PluginBus, finish, msg_args, send, send_reply
-from melobot.models import image_msg
+from melobot.models.cq import image_msg
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from ..public_utils import base64_encode

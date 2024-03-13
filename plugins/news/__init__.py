@@ -1,7 +1,9 @@
 import datetime
 from functools import partial
 
-from melobot import Plugin, bot, image_msg, send, send_custom_msg, to_coro
+from melobot import Plugin, bot, send, to_coro
+from melobot.context.action import send_custom_msg
+from melobot.models.cq import image_msg
 from melobot.types.exceptions import BotException
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN

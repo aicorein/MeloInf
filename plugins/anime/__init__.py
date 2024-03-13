@@ -5,14 +5,14 @@ from melobot import (
     Plugin,
     PluginStore,
     cooldown,
-    custom_msg_node,
     finish,
     msg_event,
     pause,
     reply_finish,
     send,
-    send_forward
 )
+from melobot.context.action import send_forward
+from melobot.models.cq import custom_msg_node
 from melobot.types.exceptions import SessionHupTimeout
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN

@@ -16,24 +16,19 @@ from melobot import (
     ResponseEvent,
     bot,
     finish,
-    get_id,
-    image_msg,
     msg_args,
     msg_event,
     msg_text,
     notice_event,
     pause,
-    reply_msg,
     send,
-    send_custom_msg,
-    send_hup,
     send_reply,
+    send_wait,
     session,
-    take_custom_action,
-    text_msg,
-    to_cq_str,
-    touch_msg,
 )
+from melobot.context.action import send_custom_msg, take_custom_action
+from melobot.models.cq import image_msg, reply_msg, text_msg, to_cq_str, touch_msg
+from melobot.types.tools import get_id
 from melobot.types.exceptions import SessionHupTimeout
 
 from ..env import PARSER_GEN, get_owner_checker, get_su_checker
@@ -142,7 +137,7 @@ class TestUtils(Plugin):
 
         set_event_records()
         append_event_records()
-        await send_hup(
+        await send_wait(
             f"是否启用时长为 {self.session_overtime_t}s 的会话超时功能？（y/n）"
         )
         append_event_records()
@@ -160,12 +155,14 @@ class TestUtils(Plugin):
                     f"[{', '.join(['0x%x' %id(e) for e in get_event_records()])}]"
                 )
                 if overtime:
-                    await send_hup(
+                    await send_wait(
                         f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}",
                         overtime=self.session_overtime_t,
                     )
                 else:
-                    await send_hup(f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}")
+                    await send_wait(
+                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}"
+                    )
                 append_event_records()
             except SessionHupTimeout:
                 self.test_cnt += 1

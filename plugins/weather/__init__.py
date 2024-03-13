@@ -9,7 +9,7 @@ from melobot import (
     send_reply,
     timelimit,
 )
-from melobot.models import image_msg
+from melobot.models.cq import image_msg
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
 from ..public_utils import async_http, get_headers

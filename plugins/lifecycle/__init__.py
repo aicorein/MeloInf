@@ -13,9 +13,9 @@ from melobot import (
     msg_args,
     msg_event,
     send,
-    send_custom_msg,
     send_reply,
 )
+from melobot.context.action import send_custom_msg
 
 from ..env import BOT_INFO, CHECKER_GEN, COMMON_CHECKER, PARSER_GEN, get_owner_checker
 from .recovery import read_rec, save_rec
