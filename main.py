@@ -1,10 +1,8 @@
-import sys
+from melobot import BotLogger, ForwardWsConn, MeloBot
 
-sys.path.append("../src")
-
-from melobot import MeloBot
-
-bot = MeloBot()
-bot.init("./config")
-bot.load_plugins("./plugins")
-bot.run()
+bot = MeloBot("MeloInf")
+conn = ForwardWsConn("127.0.0.1", 8080)
+bot_logger = BotLogger("MeloInf", "DEBUG", to_dir="./logs")
+bot.init(conn, bot_logger)
+bot.load_plugins("plugins")
+MeloBot.start(bot)

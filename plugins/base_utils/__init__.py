@@ -1,11 +1,14 @@
 import io
 from typing import Tuple
 
-from melobot import Plugin, PluginBus, bot
+from melobot import MeloBot, Plugin
 from melobot.context.action import get_cq_version, get_login_info
 from melobot.models.cq import text_msg
 
+from ..env import BOT_INFO
 from .utils import txt2img, wrap_s
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 
 class BaseUtils(Plugin):
@@ -29,7 +32,7 @@ class BaseUtils(Plugin):
         self.cq_protocol_ver = None
         self.cq_other_infos = None
 
-    @PluginBus.on("BaseUtils", "txt2img")
+    @bot.on_signal("BaseUtils", "txt2img")
     async def _txt2img(
         self,
         s: str,
@@ -49,7 +52,7 @@ class BaseUtils(Plugin):
         img.save(imgio, format="JPEG", quality=95)
         return imgio.getvalue()
 
-    @PluginBus.on("BaseUtils", "txt2msgs")
+    @bot.on_signal("BaseUtils", "txt2msgs")
     async def txt2msgs(self, s: str, one_msg_len: int = 300):
         txt_list = list(map(lambda x: x.strip("\n"), wrap_s(s, one_msg_len)))
         return [text_msg(txt) for txt in txt_list]

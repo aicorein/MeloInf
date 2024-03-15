@@ -15,19 +15,22 @@ r_regex = re.compile(r"(\d*d\d*)")
 
 
 def r_gen(string: str) -> str:
-    ns = string.lower().replace("x", "*")
-    ss = r_regex.split(ns)
-    for i in range(1, len(ss), 2):
-        a, b = ss[i].split("d")
-        if a == "" and b == "":
-            a, b = BOT_INFO.dice_base_r
-        else:
-            a, b = int(a), int(b)
-        res = 0
-        for j in range(a):
-            res += random.randint(1, b)
-        ss[i] = str(res)
-    return str(int(eval("".join(ss))))
+    try:
+        ns = string.lower().replace("x", "*")
+        ss = r_regex.split(ns)
+        for i in range(1, len(ss), 2):
+            a, b = ss[i].split("d")
+            if a == "" and b == "":
+                a, b = BOT_INFO.dice_base_r
+            else:
+                a, b = int(a), int(b)
+            res = 0
+            for j in range(a):
+                res += random.randint(1, b)
+            ss[i] = str(res)
+        return str(int(eval("".join(ss))))
+    except Exception as e:
+        return f"掷骰表达式无法解析：\n[{e.__class__.__name__}] {e}"
 
 
 class DeckItem:

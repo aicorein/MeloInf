@@ -2,13 +2,23 @@ from random import choice, random
 from typing import List
 
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin
-from melobot import PluginStore as Store
-from melobot import lock, msg_args, msg_event, msg_text, send, send_reply
+from melobot import (
+    CmdParser,
+    MeloBot,
+    Plugin,
+    lock,
+    msg_args,
+    msg_event,
+    msg_text,
+    send,
+    send_reply,
+)
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, get_white_checker
 from ..public_utils import remove_ask_punctuation, remove_punctuation
 from .dict import BOT_FLAG, OWNER_FLAG, SENDER_FLAG, WORD_DICT, add_pair
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 make_reply = Plugin.on_every_message(checker=COMMON_CHECKER)
 words_info = Plugin.on_message(
@@ -39,7 +49,7 @@ teach = Plugin.on_message(
 class WordlibLoader(Plugin):
     def __init__(self) -> None:
         super().__init__()
-        self.bot_id = Store.get("BaseUtils", "bot_id")
+        self.bot_id = bot.get_share("BaseUtils", "bot_id")
         self.special_prob = 0.001
 
     def get_keys(self) -> List[str]:

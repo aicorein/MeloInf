@@ -1,38 +1,32 @@
 import asyncio as aio
-import importlib
 import json
 from random import randint
-from typing import Callable, cast
+from typing import cast
 
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule
 from melobot import AttrSessionRule as AttrRule
 from melobot import (
     BotAction,
-    MessageEvent,
+    MeloBot,
     Plugin,
-    PluginBus,
-    PluginStore,
     ResponseEvent,
-    bot,
-    finish,
     msg_args,
     msg_event,
-    msg_text,
     notice_event,
-    pause,
     send,
     send_reply,
-    send_wait,
-    session,
 )
 from melobot.context.action import send_custom_msg, take_custom_action
 from melobot.models.cq import image_msg, reply_msg, text_msg, to_cq_str, touch_msg
 from melobot.types.tools import get_id
-from melobot.types.exceptions import SessionHupTimeout
 
-from ..env import PARSER_GEN, get_owner_checker, get_su_checker
+from ..env import BOT_INFO, PARSER_GEN, get_owner_checker, get_su_checker
 from ..public_utils import base64_encode
+from .core_debug import core_debug_process
+from .session_test import session_test_process
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 atest = Plugin.on_message(
     checker=get_su_checker(fail_cb=lambda: send_reply("你无权使用【异步测试】功能")),
@@ -62,7 +56,7 @@ io_debug = Plugin.on_message(
         ],
     ),
 )
-core_debug = Plugin.on_message(
+core_debug_handle = Plugin.on_message(
     checker=get_owner_checker(fail_cb=lambda: send_reply("你无权使用【核心调试】功能")),
     parser=PARSER_GEN.gen(target=["核心调试", "core-debug"]),
     session_rule=AttrSessionRule("sender", "id"),
@@ -86,18 +80,6 @@ echo = Plugin.on_message(
 poke = Plugin.on_notice(type="poke")
 
 
-def set_event_records() -> None:
-    session.store_add("EVENTS", [])
-
-
-def get_event_records() -> list[MessageEvent]:
-    return session.store_get("EVENTS")
-
-
-def append_event_records() -> None:
-    get_event_records().append(msg_event())
-
-
 class TestUtils(Plugin):
     def __init__(self) -> None:
         super().__init__()
@@ -105,7 +87,7 @@ class TestUtils(Plugin):
         self.session_simulate_t = 1
         self.session_overtime_t = 10
         self.test_cnt = 0
-        self.bot_id = PluginStore.get("BaseUtils", "bot_id")
+        self.bot_id = bot.get_share("BaseUtils", "bot_id")
         self.io_debug_flag = False
 
     @atest
@@ -125,57 +107,8 @@ class TestUtils(Plugin):
 
     @stest
     async def sessoin_test(self) -> None:
-        cnt = 0
-        overtime = False
-        qid = msg_event().sender.id
-        resp = await send(
-            f"会话测试开始。识别标记：{qid}，模拟间隔：{self.session_simulate_t}s。输入 stop 可停止本次会话测试",
-            wait=True,
-        )
-        resp = cast(ResponseEvent, resp)
-        start_msg_id = resp.data["message_id"]
-
-        set_event_records()
-        append_event_records()
-        await send_wait(
-            f"是否启用时长为 {self.session_overtime_t}s 的会话超时功能？（y/n）"
-        )
-        append_event_records()
-        if msg_text() == "y":
-            overtime = True
-        cnt += 1
-
-        while True:
-            if "stop" in msg_text():
-                break
-            cnt += 1
-            await aio.sleep(self.session_simulate_t)
-            try:
-                eid_list_s = (
-                    f"[{', '.join(['0x%x' %id(e) for e in get_event_records()])}]"
-                )
-                if overtime:
-                    await send_wait(
-                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}",
-                        overtime=self.session_overtime_t,
-                    )
-                else:
-                    await send_wait(
-                        f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}"
-                    )
-                append_event_records()
-            except SessionHupTimeout:
-                self.test_cnt += 1
-                await finish(
-                    [
-                        reply_msg(start_msg_id),
-                        text_msg(f"session 挂起等待超时，√ 标记为 {qid} 会话测试结束"),
-                    ]
-                )
+        await session_test_process(self.session_simulate_t, self.session_overtime_t)
         self.test_cnt += 1
-        await finish(
-            [reply_msg(start_msg_id), text_msg(f"√ 标记为 {qid} 会话测试结束")]
-        )
 
     @test_n
     async def test_stat(self) -> None:
@@ -205,7 +138,7 @@ class TestUtils(Plugin):
         debug_action = action.copy()
         output = f"event:\n{e_str}\n\naction:\n{a_str}"
         if len(output) <= 10000:
-            data = await PluginBus.emit(
+            data = await bot.emit_signal(
                 "BaseUtils", "txt2img", output, 50, 16, wait=True
             )
             data = base64_encode(data)
@@ -216,79 +149,9 @@ class TestUtils(Plugin):
         debug_action.mark("TestUtils", "io-debug")
         await take_custom_action(debug_action)
 
-    async def format_send(self, send_func: Callable, s: str) -> None:
-        if len(s) <= 300:
-            await send_func(s)
-        elif len(s) > 10000:
-            await send_func("<返回结果长度大于 10000，请使用调试器>")
-        else:
-            data = await PluginBus.emit("BaseUtils", "txt2img", s, 100, 16, wait=True)
-            data = base64_encode(data)
-            await send_func(image_msg(data))
-
-    @core_debug
-    async def core_debug(self) -> None:
-        await send(
-            "【你已进入核心调试状态】\n注意 ⚠️：对核心的错误修改可能导致崩溃，请谨慎操作！"
-        )
-        await send(
-            "【输入求值表达式以查看值】\n例：bot.plugins['TestUtils']\n输入 $e$ 退出调试\n输入 $i$ 导入一个模块\n输入 $m$ 修改当前查看的值"
-        )
-        pointer = None
-        imports = {}
-        var_map = {"bot": bot.__origin__}
-        while True:
-            await pause()
-            match msg_text():
-                case "$e$":
-                    await finish("已退出核心调试状态")
-                case "$i$":
-                    await send("【开始导入在调试时可用的模块】\n$e$ 退出导入操作")
-                    await pause()
-                    try:
-                        text = msg_text()
-                        if text == "$e$":
-                            await send("已退出导入操作")
-                            continue
-                        module = importlib.import_module(text)
-                        imports[text] = module
-                        var_map.update(imports)
-                        await send(f"{text} 导入完成 ✅")
-                    except Exception as e:
-                        await send(f"尝试导入模块时发生异常 ❌：{e.__str__()}")
-                case "$m$":
-                    if pointer is None:
-                        await send("当前修改指向空对象，拒绝操作 ❌")
-                        continue
-                    else:
-                        await send(
-                            f"【输入修改后的值：】\n$e$ 退出修改操作\n当前指向对象：{pointer}"
-                        )
-                        await pause()
-                        try:
-                            text = msg_text()
-                            if text == "$e$":
-                                await send("已退出修改操作")
-                                continue
-                            exec(
-                                f"{pointer}={msg_text()}",
-                                var_map,
-                            )
-                            val = eval(f"{pointer}", var_map)
-                            await self.format_send(
-                                send, f"修改后的值为：{val}\n类型：{type(val)}"
-                            )
-                        except Exception as e:
-                            await send(
-                                f"尝试修改值并重新显示时发生异常 ❌：{e.__str__()}"
-                            )
-                case _:
-                    try:
-                        val = eval(f"{msg_text()}", var_map)
-                        pointer = msg_text()
-                        await self.format_send(send_reply, str(val))
-                    except Exception as e:
-                        await send(f"获取值时出现异常 ❌：{e.__str__()}")
+    @core_debug_handle
+    async def _core_debug(self) -> None:
+        await core_debug_process()
 
     @poke
     async def poke(self) -> None:

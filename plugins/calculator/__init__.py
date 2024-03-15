@@ -1,5 +1,9 @@
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, PluginBus, msg_args, send_reply
+from melobot import CmdParser, MeloBot, Plugin, msg_args, send_reply
+
+from ..env import BOT_INFO
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 from ..env import COMMON_CHECKER
 
@@ -27,7 +31,7 @@ class Calculator(Plugin):
     @calc
     async def calc(self) -> None:
         expression = msg_args().pop(0)
-        output = await PluginBus.emit(
+        output = await bot.emit_signal(
             "CodeCompiler", "do_calc", expression, 15, "py3", wait=True
         )
         await send_reply(output)

@@ -1,10 +1,12 @@
 from melobot import ArgFormatter as Format
-from melobot import Plugin, PluginBus, finish, msg_args, send, send_reply
+from melobot import MeloBot, Plugin, finish, msg_args, send, send_reply
 from melobot.models.cq import image_msg
 
-from ..env import COMMON_CHECKER, PARSER_GEN
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
 from ..public_utils import base64_encode
 from .utils import DeckStore, r_gen
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 dice_r = Plugin.on_message(
     checker=COMMON_CHECKER,
@@ -62,12 +64,8 @@ class DiceSimulator(Plugin):
     @dice_r
     async def dice_r(self) -> None:
         s = msg_args().pop(0)
-        try:
-            output = r_gen(s)
-            await send_reply(output)
-        except Exception as e:
-            await send_reply("掷骰表达式解析错误...已记录错误日志")
-            raise e
+        output = r_gen(s)
+        await send_reply(output)
 
     @dice_draw
     async def dice_draw(self) -> None:
@@ -84,6 +82,6 @@ class DiceSimulator(Plugin):
             map(lambda x: x.replace("\n\n", "\n").strip("\n"), samples)
         )
         if len(output) > 200:
-            data = await PluginBus.emit("BaseUtils", "txt2img", output, wait=True)
+            data = await bot.emit_signal("BaseUtils", "txt2img", output, wait=True)
             await finish(image_msg(base64_encode(data)))
         await send_reply(output)

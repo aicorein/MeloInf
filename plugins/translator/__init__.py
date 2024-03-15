@@ -20,7 +20,7 @@ translate = Plugin.on_message(
             Format(
                 verify=lambda x: x in ["en", "zh", "jp"],
                 src_desc="翻译目标语种",
-                src_expect="值为 ['en', 'zh', 'jp'] 其中之一",
+                src_expect="值为 [en, zh, jp] 其中之一",
                 default="zh",
             ),
         ],

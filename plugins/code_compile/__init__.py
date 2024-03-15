@@ -1,12 +1,13 @@
 from typing import Dict
 
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, PluginBus, msg_args, send_reply, timelimit
+from melobot import CmdParser, MeloBot, Plugin, msg_args, send_reply, timelimit
 from melobot.types.exceptions import BotException
 
 from ..env import BOT_INFO, COMMON_CHECKER
 from ..public_utils import async_http, get_headers
 
+bot = MeloBot.get(BOT_INFO.proj_name)
 code_c = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=CmdParser(
@@ -18,7 +19,7 @@ code_c = Plugin.on_message(
                 convert=lambda x: x.lower(),
                 verify=lambda x: x in ["cpp", "cs", "py"],
                 src_desc="编程语言类型",
-                src_expect='是以下值之一（兼容大小写）：["cpp", "cs", "py"]',
+                src_expect='是以下值之一（兼容大小写）：[cpp, cs, py]',
                 default="py",
                 default_replace_flag=BOT_INFO.uni_default_flag,
             ),
@@ -37,7 +38,7 @@ class CodeCompiler(Plugin):
         super().__init__()
         self.url = "https://www.runoob.com/try/compile2.php"
 
-    @PluginBus.on("CodeCompiler", "do_calc")
+    @bot.on_signal("CodeCompiler", "do_calc")
     async def do_calc(self, expression: str, lang_id: int, ext: str) -> str:
         code = f"print(eval('{expression}'))"
         output = await self.compile(code, lang_id, ext)

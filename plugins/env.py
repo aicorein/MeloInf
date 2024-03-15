@@ -1,3 +1,4 @@
+import pathlib
 from typing import Any, Callable, Coroutine, List, Tuple
 
 import toml
@@ -36,6 +37,19 @@ class BotInfo:
         self.hash_salt: str = CONFIG["hash_salt"]
         self.news_time: str = CONFIG["everyday_news_time"]
         self.news_gruop: List[int] = CONFIG["everyday_news_group"]
+
+        if not pathlib.Path(self.figure_font).is_absolute():
+            self.figure_font = str(
+                pathlib.Path(settings_path)
+                .parent.joinpath(self.figure_font)
+                .resolve(True)
+            )
+        if not pathlib.Path(self.txt2img_font).is_absolute():
+            self.txt2img_font = str(
+                pathlib.Path(settings_path)
+                .parent.joinpath(self.txt2img_font)
+                .resolve(True)
+            )
 
 
 BOT_INFO = BotInfo()

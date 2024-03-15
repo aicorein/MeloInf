@@ -2,8 +2,8 @@ from urllib.parse import quote
 
 from melobot import (
     AttrSessionRule,
+    MeloBot,
     Plugin,
-    PluginStore,
     cooldown,
     finish,
     msg_event,
@@ -18,6 +18,8 @@ from melobot.types.exceptions import SessionHupTimeout
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
 from ..public_utils import async_http, get_headers
 
+bot = MeloBot.get(BOT_INFO.proj_name)
+
 anime_recognize = Plugin.on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(["番剧识别", "anime"]),
@@ -30,7 +32,7 @@ anime_recognize = Plugin.on_message(
 class AnimeSearcher(Plugin):
     def __init__(self) -> None:
         super().__init__()
-        self.bot_id = PluginStore.get("BaseUtils", "bot_id")
+        self.bot_id = bot.get_share("BaseUtils", "bot_id")
         self.anime_search_url = (
             "https://api.trace.moe/search?anilistInfo&cutBorders&url="
         )

@@ -1,13 +1,15 @@
 import datetime
 from functools import partial
 
-from melobot import Plugin, bot, send, to_coro
+from melobot import MeloBot, Plugin, async_at, send, to_coro
 from melobot.context.action import send_custom_msg
 from melobot.models.cq import image_msg
 from melobot.types.exceptions import BotException
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
 from ..public_utils import async_http, base64_encode, get_headers
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 manual_news = Plugin.on_message(
     checker=COMMON_CHECKER, parser=PARSER_GEN.gen(target=["news", "每日新闻"])
@@ -33,7 +35,7 @@ class EveryDayNews(Plugin):
             data = base64_encode(data)
             return data
 
-    @bot.on_all_loaded()
+    @bot.on_loaded()
     async def news_arrange(self) -> None:
         if len(self.news_group) == 0:
             return
@@ -55,7 +57,7 @@ class EveryDayNews(Plugin):
                 for g in self.news_group:
                     await send_custom_msg(image_msg(image), False, groupId=g)
 
-            await bot.async_at(
+            await async_at(
                 news_launch(),
                 news_t.timestamp(),
                 exit_cb=to_coro(partial(self.LOGGER.info, "每日新闻任务已取消")),

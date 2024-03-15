@@ -4,12 +4,11 @@ import time
 from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
 from melobot import (
+    MeloBot,
     MetaInfo,
     Plugin,
-    PluginStore,
     PriorLevel,
     User,
-    bot,
     msg_args,
     msg_event,
     send,
@@ -18,7 +17,8 @@ from melobot import (
 from melobot.context.action import send_custom_msg
 
 from ..env import BOT_INFO, CHECKER_GEN, COMMON_CHECKER, PARSER_GEN, get_owner_checker
-from .recovery import read_rec, save_rec
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 META_INFO = MetaInfo()
 BOT_NICKNAME = BOT_INFO.bot_nickname
@@ -42,9 +42,9 @@ life = Plugin.on_message(
         target=["life", "状态设置"],
         formatters=[
             Format(
-                verify=lambda x: x in ["on", "off", "stop", "restart", "re"],
+                verify=lambda x: x in ["on", "off", "stop"],
                 src_desc="工作状态变更选项",
-                src_expect="以下值之一：['on', 'off', 'stop', 'restart', 're']",
+                src_expect="以下值之一：[on, off, stop]",
             )
         ],
     ),
@@ -79,10 +79,10 @@ class LifeCycleUtils(Plugin):
         self.rec_name = "restart.rec"
         self.start_moment = time.time()
         self.format_start_moment = dt.datetime.now().strftime("%m-%d %H:%M:%S")
-        self.cq_app_name = PluginStore.get("BaseUtils", "cq_app_name")
-        self.cq_app_ver = PluginStore.get("BaseUtils", "cq_app_ver")
-        self.cq_protocol_ver = PluginStore.get("BaseUtils", "cq_protocol_ver")
-        self.cq_other_infos = PluginStore.get("BaseUtils", "cq_other_infos")
+        self.cq_app_name = bot.get_share("BaseUtils", "cq_app_name")
+        self.cq_app_ver = bot.get_share("BaseUtils", "cq_app_ver")
+        self.cq_protocol_ver = bot.get_share("BaseUtils", "cq_protocol_ver")
+        self.cq_other_infos = bot.get_share("BaseUtils", "cq_other_infos")
 
     @property
     def running_time(self) -> float:
@@ -100,16 +100,6 @@ class LifeCycleUtils(Plugin):
         secs = worked_time % 60
         time_str_list = format_nums(days, hours, mins, secs)
         return ":".join(time_str_list)
-
-    @bot.on_connected()
-    async def restart_wake(self) -> None:
-        res = read_rec(str(self.PATH), self.rec_name)
-        if res is not None:
-            sender_id, is_private, group_id = res
-            await send_custom_msg(
-                f"{BOT_NICKNAME} 重启完成~", is_private, sender_id, group_id
-            )
-            self.LOGGER.info("本次启动为指令触发的重启，已回复重启成功消息")
 
     @info
     async def info(self) -> None:
@@ -150,11 +140,10 @@ class LifeCycleUtils(Plugin):
     @status
     async def status(self) -> None:
         all_plugins = bot.get_plugins()
-        output = " ● 运行模式：{}\n ● 启动时间：{}\n ● 已运行：{}\n ● 全局冷却时间：{}s\n ● 已加载插件：{}".format(
-            "模块运行模式" if bot.is_module_run() else "脚本运行模式",
+        output = " ● 启动时间：{}\n ● 已运行：{}\n ● 连接适配器冷却：{}s\n ● 已加载插件：{}".format(
             self.format_start_moment,
             self.format_running_time,
-            bot.get_config().cooldown_time,
+            bot.connector.cd_time,
             ", ".join([p.id for p in all_plugins.values()])
             + f"（{len(all_plugins)} 个）",
         )
@@ -165,7 +154,7 @@ class LifeCycleUtils(Plugin):
         option = msg_args().pop(0)
         match option:
             case "on":
-                if bot.is_activate:
+                if bot.is_activate():
                     await send(f"{BOT_NICKNAME} 已经在工作啦~")
                 else:
                     bot.activate()
@@ -177,12 +166,3 @@ class LifeCycleUtils(Plugin):
                 await send(f"{BOT_NICKNAME} 下班啦~")
                 self.LOGGER.info("指令触发停止操作，正在关闭 bot")
                 await bot.close()
-            case "restart" | "re":
-                if bot.is_module_run():
-                    await send(f"{BOT_NICKNAME} 正在准备重启...")
-                    save_rec(str(self.PATH), self.rec_name)
-                    await bot.restart()
-                else:
-                    await send(
-                        f"{BOT_NICKNAME} 当前运行模式不支持重启哦，如需重启，请使用模块运行模式：\npython -m melobot main.py"
-                    )

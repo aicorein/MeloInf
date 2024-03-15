@@ -9,10 +9,9 @@ from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
 from melobot import (
     CmdParser,
+    MeloBot,
     MetaInfo,
     Plugin,
-    PluginBus,
-    bot,
     finish,
     msg_args,
     msg_event,
@@ -25,8 +24,10 @@ from melobot.context.action import send_custom_msg
 from melobot.models.cq import CQMsgDict, image_msg
 from melobot.types.exceptions import BotException
 
-from ..env import get_owner_checker
+from ..env import BOT_INFO, get_owner_checker
 from ..public_utils import base64_encode
+
+bot = MeloBot.get(BOT_INFO.proj_name)
 
 META_INFO = MetaInfo()
 shell = Plugin.on_message(
@@ -59,7 +60,7 @@ class ShellManager(Plugin):
         self._buf: list[tuple[float, str]] = []
         self._cache_time = 0.3
 
-    @bot.on_all_loaded()
+    @bot.on_loaded()
     async def open_shell(self) -> None:
         self.shell = await aio.create_subprocess_exec(
             self.executable,
@@ -132,7 +133,7 @@ class ShellManager(Plugin):
                         p = self.pointer
                         msg: str | CQMsgDict
                         if len(s) > 200:
-                            data = await PluginBus.emit(
+                            data = await bot.emit_signal(
                                 "BaseUtils", "txt2img", s, wait=True
                             )
                             b64_data = base64_encode(data)
