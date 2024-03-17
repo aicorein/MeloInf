@@ -1,14 +1,11 @@
 import importlib
 from typing import Callable
 
-from melobot import MeloBot, finish, msg_text, pause, send, send_reply
+from melobot import finish, msg_text, pause, send, send_reply, thisbot
 from melobot.models.cq import image_msg
-from melobot.types.tools import get_rich_str
 
-from ..env import BOT_INFO
 from ..public_utils import base64_encode
-
-bot = MeloBot.get(BOT_INFO.proj_name)
+from ._iface import core_debug
 
 
 async def format_send(send_func: Callable, s: str) -> None:
@@ -17,11 +14,12 @@ async def format_send(send_func: Callable, s: str) -> None:
     elif len(s) > 10000:
         await send_func("<返回结果长度大于 10000，请使用调试器>")
     else:
-        data = await bot.emit_signal("BaseUtils", "txt2img", s, 70, 16, wait=True)
+        data = await thisbot.emit_signal("BaseUtils", "txt2img", s, 70, 16, wait=True)
         data = base64_encode(data)
         await send_func(image_msg(data))
 
 
+@core_debug
 async def core_debug_process() -> None:
     await send(
         "【你已进入核心调试状态】\n注意 ⚠️：对核心的错误修改可能导致崩溃，请谨慎操作！"
@@ -31,7 +29,7 @@ async def core_debug_process() -> None:
     )
     pointer = None
     imports = {}
-    var_map = {"bot": bot}
+    var_map = {"bot": thisbot}
     while True:
         await pause()
         match msg_text():

@@ -18,7 +18,6 @@ from ..public_utils import base64_encode
 fe = fm.FontEntry(fname=BOT_INFO.figure_font, name=BOT_INFO.figure_font.split("/")[-1])
 fm.fontManager.ttflist.insert(0, fe)
 mpl.rcParams["font.family"] = fe.name
-# plt.rcParams["font.family"] = BOT_INFO.figure_font
 plt.rcParams["axes.unicode_minus"] = False
 cwd = this_dir()
 bg_images: List[Image.Image] = []

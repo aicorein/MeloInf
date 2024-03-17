@@ -3,11 +3,13 @@ from random import choice
 from typing import Dict, List
 
 from melobot import ArgFormatter as Format
-from melobot import Plugin, msg_args, send, this_dir
+from melobot import BotPlugin, msg_args, send, this_dir
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 
-be_ill = Plugin.on_message(
+plugin = BotPlugin("AsoulIllness", version="1.0.0")
+
+be_ill = plugin.on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_GEN.gen(
         target=["发病", "ill"],
@@ -23,18 +25,14 @@ be_ill = Plugin.on_message(
 
 
 data_path = this_dir("data.json")
+with open(data_path, encoding="utf-8") as fp:
+    data: List[Dict[str, str]] = json.load(fp)
 
 
-class AsoulIllness(Plugin):
-    def __init__(self) -> None:
-        super().__init__()
-        with open(data_path, encoding="utf-8") as fp:
-            self.data: List[Dict[str, str]] = json.load(fp)
-
-    @be_ill
-    async def be_ill(self) -> None:
-        target = msg_args().pop(0)
-        text_pair = choice(self.data)
-        text, person = text_pair["text"], text_pair["person"]
-        text = text.replace(person, target)
-        await send(text, cq_str=True)
+@be_ill
+async def be_ill() -> None:
+    target = msg_args().pop(0)
+    text_pair = choice(data)
+    text, person = text_pair["text"], text_pair["person"]
+    text = text.replace(person, target)
+    await send(text, cq_str=True)

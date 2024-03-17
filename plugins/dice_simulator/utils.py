@@ -76,7 +76,7 @@ class DeckItem:
             else:
                 rec.sample_num += 1
                 rec.pos.append(i)
-                if replace == False:
+                if not replace:
                     rec.replace = False
 
         for rec in draw_recs.values():

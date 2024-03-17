@@ -1,11 +1,13 @@
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, Plugin, msg_args, send_reply, timelimit
+from melobot import BotPlugin, CmdParser, msg_args, send_reply, thisbot, timelimit
 from melobot.types.exceptions import BotException
 
 from ..env import COMMON_CHECKER
 from .utils import get_translated_text
 
-translate = Plugin.on_message(
+plugin = BotPlugin("Translator", version="1.0.0")
+
+translate = plugin.on_message(
     checker=COMMON_CHECKER,
     parser=CmdParser(
         cmd_start="*",
@@ -28,17 +30,13 @@ translate = Plugin.on_message(
 )
 
 
-class Translator(Plugin):
-    def __init__(self) -> None:
-        super().__init__()
-
-    @translate
-    @timelimit(lambda: send_reply("翻译结果获取超时，请稍候再试..."), timeout=25)
-    async def translate(self) -> None:
-        text, target = msg_args()
-        try:
-            _from, to, translated = await get_translated_text(text, target)
-            output = "【模式 {} -> {}】\n{}".format(_from, to, translated)
-            await send_reply(output)
-        except BotException as e:
-            self.LOGGER.error(e.__str__())
+@translate
+@timelimit(lambda: send_reply("翻译结果获取超时，请稍候再试..."), timeout=25)
+async def translate() -> None:
+    text, target = msg_args()
+    try:
+        _from, to, translated = await get_translated_text(text, target)
+        output = "【模式 {} -> {}】\n{}".format(_from, to, translated)
+        await send_reply(output)
+    except BotException as e:
+        thisbot.logger.error(e.__str__())

@@ -1,13 +1,11 @@
 from melobot import ArgFormatter as Format
-from melobot import CmdParser, MeloBot, Plugin, msg_args, send_reply
-
-from ..env import BOT_INFO
-
-bot = MeloBot.get(BOT_INFO.proj_name)
+from melobot import BotPlugin, CmdParser, msg_args, send_reply, thisbot
 
 from ..env import COMMON_CHECKER
 
-calc = Plugin.on_message(
+plugin = BotPlugin("Calculator", version="1.0.0")
+
+calc = plugin.on_message(
     checker=COMMON_CHECKER,
     parser=CmdParser(
         cmd_start=["~", "～"],
@@ -24,14 +22,10 @@ calc = Plugin.on_message(
 )
 
 
-class Calculator(Plugin):
-    def __init__(self) -> None:
-        super().__init__()
-
-    @calc
-    async def calc(self) -> None:
-        expression = msg_args().pop(0)
-        output = await bot.emit_signal(
-            "CodeCompiler", "do_calc", expression, 15, "py3", wait=True
-        )
-        await send_reply(output)
+@calc
+async def calc() -> None:
+    expression = msg_args().pop(0)
+    output = await thisbot.emit_signal(
+        "CodeCompiler", "do_calc", expression, 15, "py3", wait=True
+    )
+    await send_reply(output)
