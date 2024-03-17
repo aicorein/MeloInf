@@ -1,16 +1,8 @@
 import asyncio as aio
 from typing import cast
 
-from melobot import (
-    MessageEvent,
-    ResponseEvent,
-    get_store,
-    msg_event,
-    msg_text,
-    send,
-    send_wait,
-)
-from melobot.models.cq import reply_msg, text_msg
+from melobot import get_store, msg_event, msg_text, send, send_wait
+from melobot.models import MessageEvent, ResponseEvent, reply_msg, text_msg
 from melobot.types.exceptions import SessionHupTimeout
 
 from ._iface import PluginSpace, stest

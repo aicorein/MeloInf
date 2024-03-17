@@ -2,8 +2,8 @@ import io
 from typing import Tuple
 
 from melobot import BotPlugin, thisbot
-from melobot.context.action import get_cq_version, get_login_info
-from melobot.models.cq import text_msg
+from melobot.context import get_cq_version, get_login_info
+from melobot.models import text_msg
 
 from .utils import txt2img, wrap_s
 

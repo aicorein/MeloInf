@@ -1,5 +1,5 @@
 from melobot import finish, msg_args, send, send_reply, thisbot
-from melobot.models.cq import image_msg
+from melobot.models import image_msg
 
 from ..public_utils import base64_encode
 from ._iface import PluginSpace, dice_draw, dice_info, dice_r

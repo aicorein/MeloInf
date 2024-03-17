@@ -1,6 +1,8 @@
 from melobot import User, msg_args, msg_event, send, send_reply, thisbot
+from melobot.models import image_msg
 
 from ..env import BOT_INFO, CHECKER_GEN
+from ..public_utils import base64_encode
 from ._iface import PluginRef, PluginSpace, auth, info, life, status
 
 BOT_NICKNAME = PluginSpace.bot_nickname
@@ -51,13 +53,14 @@ async def auth() -> None:
 @status
 async def status() -> None:
     all_plugins = thisbot.get_plugins()
-    output = " ● 启动时间：{}\n ● 已运行：{}\n ● 连接适配器冷却：{}s\n ● 已加载插件：{}".format(
+    output = " ● 启动时间：{}\n ● 已运行：{}\n ● 连接适配器冷却：{}s\n ● 已加载插件：\n{}".format(
         PluginSpace.format_start_moment,
         PluginSpace.get_format_running_time(),
         thisbot.connector.cd_time,
-        ", ".join([p.id for p in all_plugins.values()]) + f"（{len(all_plugins)} 个）",
+        "\n".join(f"  - {p.id}: v{p.version}" for p in all_plugins.values()),
     )
-    await send(output)
+    data = await thisbot.emit_signal("BaseUtils", "txt2img", output, 40, wait=True)
+    await send(image_msg(base64_encode(data)))
 
 
 @life

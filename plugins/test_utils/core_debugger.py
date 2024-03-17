@@ -2,7 +2,7 @@ import importlib
 from typing import Callable
 
 from melobot import finish, msg_text, pause, send, send_reply, thisbot
-from melobot.models.cq import image_msg
+from melobot.models import image_msg
 
 from ..public_utils import base64_encode
 from ._iface import core_debug

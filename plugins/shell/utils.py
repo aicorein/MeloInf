@@ -5,8 +5,8 @@ import time
 import psutil
 
 from melobot import thisbot
-from melobot.context.action import send_custom_msg
-from melobot.models.cq import CQMsgDict, image_msg
+from melobot.context import send_custom_msg
+from melobot.models import CQMsgDict, image_msg
 from melobot.types.exceptions import BotException
 
 from ..public_utils import base64_encode
