@@ -3,8 +3,10 @@ import json
 from random import randint
 from typing import cast
 
-from melobot import msg_args, msg_event, notice_event, send, thisbot
-from melobot.context import send_custom_msg, take_custom_action
+from melobot import msg_args, msg_event, send, thisbot
+from melobot.base import BotAction
+from melobot.base.tools import get_id
+from melobot.context import notice_event, send_custom_msg, take_custom_action
 from melobot.models import (
     ResponseEvent,
     image_msg,
@@ -13,8 +15,6 @@ from melobot.models import (
     text_msg,
     to_cq_str,
 )
-from melobot.types import BotAction
-from melobot.types.tools import get_id
 
 from ..public_utils import base64_encode
 from ._iface import PluginRef, PluginSpace, atest, echo, io_debug, plugin, poke, test_n

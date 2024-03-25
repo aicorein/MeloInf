@@ -3,7 +3,7 @@ from urllib.parse import quote
 from melobot import cooldown, finish, msg_event, pause, reply_finish, send, thisbot
 from melobot.context import send_forward
 from melobot.models import custom_msg_node
-from melobot.types.exceptions import SessionHupTimeout
+from melobot.base.exceptions import SessionHupTimeout
 
 from ..env import BOT_INFO
 from ..public_utils import async_http, get_headers

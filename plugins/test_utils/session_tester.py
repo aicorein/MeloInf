@@ -3,7 +3,7 @@ from typing import cast
 
 from melobot import get_store, msg_event, msg_text, send, send_wait
 from melobot.models import MessageEvent, ResponseEvent, reply_msg, text_msg
-from melobot.types.exceptions import SessionHupTimeout
+from melobot.base.exceptions import SessionHupTimeout
 
 from ._iface import PluginSpace, stest
 

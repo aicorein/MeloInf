@@ -5,9 +5,10 @@ import time
 import psutil
 
 from melobot import thisbot
+from melobot.base.exceptions import BotException
+from melobot.base.typing import CQMsgDict
 from melobot.context import send_custom_msg
-from melobot.models import CQMsgDict, image_msg
-from melobot.types.exceptions import BotException
+from melobot.models import image_msg
 
 from ..public_utils import base64_encode
 from ._iface import PluginSpace as Space

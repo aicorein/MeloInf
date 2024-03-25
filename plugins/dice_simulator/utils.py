@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 import toml
 
 from melobot import this_dir
-from melobot.types.exceptions import BotException
+from melobot.base.exceptions import BotException
 
 from ..env import BOT_INFO
 

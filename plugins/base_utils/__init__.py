@@ -2,7 +2,7 @@ import io
 from typing import Tuple
 
 from melobot import BotPlugin, thisbot
-from melobot.context import get_cq_version, get_login_info
+from melobot.context import get_login_info, get_onebot_version
 from melobot.models import text_msg
 
 from .utils import txt2img, wrap_s
@@ -70,7 +70,7 @@ async def login_info() -> None:
 
 @plugin.on_connected
 async def get_version_info() -> None:
-    resp = await get_cq_version()
+    resp = await get_onebot_version()
     if resp.is_ok():
         PluginSpace.cq_app_name = resp.data.pop("app_name")
         PluginSpace.cq_app_ver = resp.data.pop("app_version")

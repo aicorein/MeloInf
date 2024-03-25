@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 from melobot import this_dir
-from melobot.types.tools import get_id
+from melobot.base.tools import get_id
 
 from ..env import BOT_INFO
 from ..public_utils import base64_encode
