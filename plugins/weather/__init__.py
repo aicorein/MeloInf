@@ -1,6 +1,6 @@
-from melobot import ArgFormatter as Format
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
 from melobot import (
-    BotPlugin,
     finish,
     lock,
     msg_args,

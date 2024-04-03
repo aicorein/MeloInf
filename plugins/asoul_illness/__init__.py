@@ -2,8 +2,9 @@ import json
 from random import choice
 from typing import Dict, List
 
-from melobot import ArgFormatter as Format
-from melobot import BotPlugin, msg_args, send, this_dir
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
+from melobot import msg_args, send, this_dir
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 

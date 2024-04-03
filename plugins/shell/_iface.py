@@ -1,9 +1,10 @@
 import asyncio as aio
 from typing import List, Optional, Tuple
 
-from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
-from melobot import BotPlugin, CmdParser, MetaInfo, send, send_reply, this_dir
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
+from melobot import CmdParser, MetaInfo, send, send_reply, this_dir
 
 from ..env import get_owner_checker
 

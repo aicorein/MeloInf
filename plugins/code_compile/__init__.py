@@ -1,5 +1,6 @@
-from melobot import ArgFormatter as Format
-from melobot import BotPlugin, CmdParser, msg_args, send_reply, timelimit
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
+from melobot import CmdParser, msg_args, send_reply, timelimit
 from melobot.base.exceptions import BotException
 
 from ..env import BOT_INFO, COMMON_CHECKER

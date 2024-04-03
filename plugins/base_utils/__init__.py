@@ -76,6 +76,6 @@ async def get_version_info() -> None:
         PluginSpace.cq_app_ver = resp.data.pop("app_version")
         PluginSpace.cq_protocol_ver = resp.data.pop("protocol_version")
         PluginSpace.cq_other_infos = resp.data
-        thisbot.logger.info("成功获得 cq 前端实现的信息并存储")
+        thisbot.logger.info("成功获得 onebot 前端实现的信息并存储")
     else:
-        thisbot.logger.warning("获取 cq 前端实现的信息失败")
+        thisbot.logger.warning("获取 onebot 前端实现的信息失败")

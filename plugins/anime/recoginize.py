@@ -1,9 +1,9 @@
 from urllib.parse import quote
 
 from melobot import cooldown, finish, msg_event, pause, reply_finish, send, thisbot
+from melobot.base.exceptions import SessionHupTimeout
 from melobot.context import send_forward
 from melobot.models import custom_msg_node
-from melobot.base.exceptions import SessionHupTimeout
 
 from ..env import BOT_INFO
 from ..public_utils import async_http, get_headers
@@ -25,7 +25,7 @@ async def anime_recogize() -> None:
     except SessionHupTimeout:
         await reply_finish("等待发送图片超时，识番任务已取消")
 
-    params = msg_event().get_cq_params("image", "url")
+    params = msg_event().get_datas("image", "url")
     if len(params) <= 0:
         await reply_finish("发送的消息未识别到图片，识番功能已退出")
     req_url = PluginSpace.anime_search_url + quote(params.pop(0))

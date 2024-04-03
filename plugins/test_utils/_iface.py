@@ -1,6 +1,7 @@
-from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
-from melobot import BotPlugin, send, send_reply, thisbot
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
+from melobot import send, send_reply, thisbot
 
 from ..env import PARSER_GEN, get_owner_checker, get_su_checker
 

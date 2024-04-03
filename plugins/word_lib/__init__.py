@@ -1,9 +1,9 @@
 from random import choice, random
 from typing import List
 
-from melobot import ArgFormatter as Format
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
 from melobot import (
-    BotPlugin,
     CmdParser,
     lock,
     msg_args,
@@ -30,7 +30,7 @@ class PluginRef:
         return await thisbot.get_share("BaseUtils", "bot_id").val
 
 
-make_reply = plugin.on_every_message(checker=COMMON_CHECKER)
+make_reply = plugin.on_message(checker=COMMON_CHECKER)
 
 words_info = plugin.on_message(
     checker=COMMON_CHECKER, parser=PARSER_GEN.gen(["w-info", "词库信息"])
@@ -64,7 +64,7 @@ async def get_keys() -> List[str]:
     text = text.replace(BOT_INFO.bot_name, BOT_FLAG).replace(
         BOT_INFO.bot_nickname, BOT_FLAG
     )
-    for qid in msg_event().get_cq_params("at", "qq"):
+    for qid in msg_event().get_datas("at", "qq"):
         if qid == (await PluginRef.bot_id()):
             keys = []
             keys.append(f"{BOT_FLAG}{text}")

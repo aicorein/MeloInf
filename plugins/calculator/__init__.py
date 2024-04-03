@@ -1,5 +1,6 @@
-from melobot import ArgFormatter as Format
-from melobot import BotPlugin, CmdParser, msg_args, send_reply, thisbot
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
+from melobot import CmdParser, msg_args, send_reply, thisbot
 
 from ..env import COMMON_CHECKER
 

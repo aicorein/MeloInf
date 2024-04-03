@@ -1,5 +1,5 @@
-from melobot import ArgFormatter as Format
 from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from .utils import DeckStore

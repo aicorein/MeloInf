@@ -2,9 +2,10 @@ import datetime as dt
 import time
 from typing import Any
 
-from melobot import ArgFormatter as Format
 from melobot import AttrSessionRule as AttrRule
-from melobot import BotPlugin, MetaInfo, PriorLevel, send, send_reply, thisbot
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
+from melobot import MetaInfo, PriorLevel, send, send_reply, thisbot
 
 from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, get_owner_checker
 

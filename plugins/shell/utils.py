@@ -6,7 +6,7 @@ import psutil
 
 from melobot import thisbot
 from melobot.base.exceptions import BotException
-from melobot.base.typing import CQMsgDict
+from melobot.base.typing import MsgSegment
 from melobot.context import send_custom_msg
 from melobot.models import image_msg
 
@@ -90,7 +90,7 @@ async def _buf_monitor() -> None:
                     continue
                 if Space.pointer:
                     p = Space.pointer
-                    msg: str | CQMsgDict
+                    msg: str | MsgSegment
                     if len(s) > 200:
                         data = await thisbot.emit_signal(
                             "BaseUtils", "txt2img", s, wait=True

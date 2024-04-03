@@ -2,8 +2,9 @@ import math
 import random
 import string
 
-from melobot import ArgFormatter as Format
-from melobot import BotPlugin, msg_args, send
+from melobot import BotPlugin
+from melobot import CmdArgFormatter as Format
+from melobot import msg_args, send
 
 from ..env import COMMON_CHECKER, PARSER_GEN
 from .gen import Generator
