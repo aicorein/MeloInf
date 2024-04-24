@@ -13,7 +13,7 @@ translate = plugin.on_message(
     parser=CmdParser(
         cmd_start="*",
         cmd_sep="#",
-        target=["translate", "翻译"],
+        targets=["translate", "翻译"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 300,

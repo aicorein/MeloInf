@@ -1,19 +1,18 @@
 import asyncio as aio
-from typing import cast
 
-from melobot import get_store, msg_event, msg_text, send, send_wait
-from melobot.models import MessageEvent, ResponseEvent, reply_msg, text_msg
-from melobot.base.exceptions import SessionHupTimeout
+from melobot import msg_event, msg_text, send, send_wait, session_store
+from melobot.base.exceptions import BotSessionTimeout
+from melobot.models import MessageEvent, reply_msg, text_msg
 
 from ._iface import PluginSpace, stest
 
 
 def set_event_records() -> None:
-    get_store()["EVENTS"] = []
+    session_store()["EVENTS"] = []
 
 
 def get_event_records() -> list[MessageEvent]:
-    return get_store().get("EVENTS")
+    return session_store().get("EVENTS")
 
 
 def append_event_records() -> None:
@@ -26,10 +25,10 @@ async def session_test_process():
     overtime = False
     qid = msg_event().sender.id
     resp = await send(
-        f"会话测试开始。识别标记：{qid}，模拟间隔：{PluginSpace.session_simulate_t}s。输入 stop 可停止本次会话测试",
+        f"会话测试开始。识别标记：{qid}，模拟间隔：{PluginSpace.session_simulate_t}s。"
+        "输入 stop 可停止本次会话测试",
         wait=True,
-    )
-    resp = cast(ResponseEvent, resp)
+    ).resp
     start_msg_id = resp.data["message_id"]
 
     set_event_records()
@@ -57,7 +56,7 @@ async def session_test_process():
             else:
                 await send_wait(f"第 {cnt} 次进入会话：\n事件 id 列表：{eid_list_s}")
             append_event_records()
-        except SessionHupTimeout:
+        except BotSessionTimeout:
             await send([reply_msg(start_msg_id), text_msg("session 挂起等待超时")])
             break
     await send([reply_msg(start_msg_id), text_msg(f"√ 标记为 {qid} 会话测试结束")])

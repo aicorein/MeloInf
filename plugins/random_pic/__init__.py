@@ -1,16 +1,17 @@
 from random import choice, randint
 
-from melobot import BotPlugin, cooldown, send, send_reply, thisbot, timelimit
+from melobot import BotPlugin, reply_finish, send, send_reply, thisbot, timelimit
+from melobot.base.tools import cooldown
 from melobot.models import image_msg
 
-from ..env import COMMON_CHECKER, PARSER_GEN
+from ..env import COMMON_CHECKER, PARSER_FACTORY
 from ..public_utils import async_http, base64_encode, get_headers
 from .utils import json_pic1
 
 plugin = BotPlugin("RandomPicGen", version="1.2.0")
 
 rpic = plugin.on_message(
-    parser=PARSER_GEN.gen(target=["随机图", "rpic"]), checker=COMMON_CHECKER
+    parser=PARSER_FACTORY.get(targets=["随机图", "rpic"]), checker=COMMON_CHECKER
 )
 
 
@@ -47,13 +48,12 @@ async def random_pic() -> None:
     url = await get_pic_url()
     async with async_http(url=url, method="get", headers=get_headers()) as resp:
         if resp.status != 200:
-            await send_reply("图片获取失败...请稍后再试，或联系 bot 管理员解决")
             thisbot.logger.error(f"请求失败：{resp.status}")
-            return
+            await reply_finish("图片获取失败...请稍后再试=")
         try:
             data = await resp.read()
             code = base64_encode(data)
             await send(image_msg(code), wait=True)
         except Exception as e:
-            await send_reply("图片获取失败...请稍后再试，或联系 bot 管理员解决")
-            thisbot.logger.error(f"{e.__class__.__name__} {e}")
+            await send_reply("图片获取失败...请稍后再试")
+            raise

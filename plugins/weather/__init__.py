@@ -12,7 +12,7 @@ from melobot import (
 )
 from melobot.models import image_msg
 
-from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_FACTORY
 from ..public_utils import async_http, get_headers
 from .make_fig import gen_weather_fig
 
@@ -28,8 +28,8 @@ class Space:
 
 weather = plugin.on_message(
     checker=COMMON_CHECKER,
-    parser=PARSER_GEN.gen(
-        target=["天气", "weather"],
+    parser=PARSER_FACTORY.get(
+        targets=["天气", "weather"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 10,

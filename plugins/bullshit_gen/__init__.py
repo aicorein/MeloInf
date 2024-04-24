@@ -6,7 +6,7 @@ from melobot import BotPlugin
 from melobot import CmdArgFormatter as Format
 from melobot import msg_args, send
 
-from ..env import COMMON_CHECKER, PARSER_GEN
+from ..env import COMMON_CHECKER, PARSER_FACTORY
 from .gen import Generator
 
 plugin = BotPlugin("BullshitGen", version="1.1.0")
@@ -19,8 +19,8 @@ class PluginSpace:
 
 bullshit_gen = plugin.on_message(
     checker=COMMON_CHECKER,
-    parser=PARSER_GEN.gen(
-        target=["狗屁不通生成", "bullshit"],
+    parser=PARSER_FACTORY.get(
+        targets=["狗屁不通生成", "bullshit"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 15,
@@ -31,13 +31,13 @@ bullshit_gen = plugin.on_message(
     ),
 )
 error_codes = plugin.on_message(
-    checker=COMMON_CHECKER, parser=PARSER_GEN.gen(target=["乱码生成", "ecode"])
+    checker=COMMON_CHECKER, parser=PARSER_FACTORY.get(targets=["乱码生成", "ecode"])
 )
 
 
 @bullshit_gen
 async def bullshit_gen() -> None:
-    theme = msg_args().pop(0)
+    theme = msg_args()[0]
     output = Generator(theme, PluginSpace.gen_length).generate()
     await send(output)
 

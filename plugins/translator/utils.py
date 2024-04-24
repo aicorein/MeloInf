@@ -1,7 +1,7 @@
 import hashlib
 from typing import Tuple
 
-from melobot import send_reply
+from melobot import reply_finish, send_reply, thisbot
 from melobot.base.exceptions import BotException
 
 from ..env import BOT_INFO
@@ -31,8 +31,8 @@ async def get_translated_text(text: str, target_lang: str) -> Tuple[str, str, st
     url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
     async with async_http(url, method="post", headers=headers, data=data) as resp:
         if resp.status != 200:
-            await send_reply("翻译获取失败...请稍后再试，或联系 bot 管理员解决")
-            raise BotException(f"请求失败：{resp.status}")
+            thisbot.logger.error(f"请求失败，状态码：{resp.status}")
+            await reply_finish("翻译获取失败...请稍后再试，或联系 bot 管理员解决")
         try:
             data = await resp.json()
             return data["from"], data["to"], data["trans_result"][0]["dst"]

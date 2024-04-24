@@ -16,7 +16,7 @@ async def dice_info() -> None:
 
 @dice_r
 async def dice_r() -> None:
-    s = msg_args().pop(0)
+    s = msg_args()[0]
     output = r_gen(s)
     await send_reply(output)
 

@@ -1,18 +1,18 @@
+import asyncio
 import datetime
 
-from melobot import BotPlugin, send, thisbot
-from melobot.base.exceptions import BotException
-from melobot.base.tools import async_at
-from melobot.context import send_custom_msg
+from melobot import BotPlugin, reply_finish, send, thisbot
+from melobot.base.tools import async_at, to_task
+from melobot.context import send_custom
 from melobot.models import image_msg
 
-from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_FACTORY
 from ..public_utils import async_http, base64_encode, get_headers
 
 plugin = BotPlugin("EveryDayNews", version="1.0.0")
 
 manual_news = plugin.on_message(
-    checker=COMMON_CHECKER, parser=PARSER_GEN.gen(target=["news", "每日新闻"])
+    checker=COMMON_CHECKER, parser=PARSER_FACTORY.get(targets=["news", "每日新闻"])
 )
 
 
@@ -24,10 +24,11 @@ class PluginSpace:
     news_group = BOT_INFO.news_gruop
 
 
-async def get_news_image() -> str:
+async def get_news_image() -> str | None:
     async with async_http(PluginSpace.news_api, "get", headers=get_headers()) as resp:
         if resp.status != 200:
-            raise BotException(f"每日新闻图片获取异常，状态码：{resp.status}")
+            thisbot.logger.error(f"每日新闻图片获取异常，状态码：{resp.status}")
+            return None
         data = await resp.content.read()
         data = base64_encode(data)
         return data
@@ -51,21 +52,23 @@ async def news_arrange() -> None:
             news_t += datetime.timedelta(days=1)
 
         async def news_launch() -> None:
-            image = await get_news_image()
+            data = await get_news_image()
+            if data is None:
+                return
             for g in PluginSpace.news_group:
-                await send_custom_msg(image_msg(image), False, groupId=g)
-
-        import asyncio as aio
+                to_task(send_custom(image_msg(data), False, groupId=g))
 
         try:
             await async_at(news_launch(), news_t.timestamp())
-        except aio.CancelledError:
+            thisbot.logger.info("每日新闻已发送")
+        except asyncio.CancelledError:
             thisbot.logger.info("每日新闻任务已取消")
             return
-        thisbot.logger.info("每日新闻已发送")
 
 
 @manual_news
 async def manual_news() -> None:
     data = await get_news_image()
+    if data is None:
+        await reply_finish("每日新闻图片获取异常，请稍后再试")
     await send(image_msg(data))

@@ -6,14 +6,14 @@ from melobot import BotPlugin
 from melobot import CmdArgFormatter as Format
 from melobot import msg_args, send, this_dir
 
-from ..env import COMMON_CHECKER, PARSER_GEN
+from ..env import COMMON_CHECKER, PARSER_FACTORY
 
 plugin = BotPlugin("AsoulIllness", version="1.0.0")
 
 be_ill = plugin.on_message(
     checker=COMMON_CHECKER,
-    parser=PARSER_GEN.gen(
-        target=["发病", "ill"],
+    parser=PARSER_FACTORY.get(
+        targets=["发病", "ill"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 20,
@@ -32,7 +32,7 @@ with open(data_path, encoding="utf-8") as fp:
 
 @be_ill
 async def be_ill() -> None:
-    target = msg_args().pop(0)
+    target = msg_args()[0]
     text_pair = choice(data)
     text, person = text_pair["text"], text_pair["person"]
     text = text.replace(person, target)

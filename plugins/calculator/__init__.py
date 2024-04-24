@@ -11,7 +11,7 @@ calc = plugin.on_message(
     parser=CmdParser(
         cmd_start=["~", "～"],
         cmd_sep=" ",
-        target=["计算", "calc"],
+        targets=["计算", "calc"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 50,
@@ -25,7 +25,7 @@ calc = plugin.on_message(
 
 @calc
 async def calc() -> None:
-    expression = msg_args().pop(0)
+    expression = msg_args()[0]
     output = await thisbot.emit_signal(
         "CodeCompiler", "do_calc", expression, 15, "py3", wait=True
     )

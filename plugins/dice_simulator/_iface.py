@@ -1,7 +1,7 @@
 from melobot import BotPlugin
 from melobot import CmdArgFormatter as Format
 
-from ..env import COMMON_CHECKER, PARSER_GEN
+from ..env import COMMON_CHECKER, PARSER_FACTORY
 from .utils import DeckStore
 
 plugin = BotPlugin("DiceSimulator", version="1.2.0")
@@ -15,8 +15,8 @@ class PluginSpace:
 
 dice_r = plugin.on_message(
     checker=COMMON_CHECKER,
-    parser=PARSER_GEN.gen(
-        target=["r", "随机"],
+    parser=PARSER_FACTORY.get(
+        targets=["r", "随机"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 15,
@@ -29,8 +29,8 @@ dice_r = plugin.on_message(
 
 dice_draw = plugin.on_message(
     checker=COMMON_CHECKER,
-    parser=PARSER_GEN.gen(
-        target=["draw", "抽牌"],
+    parser=PARSER_FACTORY.get(
+        targets=["draw", "抽牌"],
         formatters=[
             Format(
                 src_desc="牌堆名",
@@ -50,5 +50,5 @@ dice_draw = plugin.on_message(
 
 dice_info = plugin.on_message(
     checker=COMMON_CHECKER,
-    parser=PARSER_GEN.gen(target=["dice-info", "dice模拟器信息"]),
+    parser=PARSER_FACTORY.get(targets=["dice-info", "dice模拟器信息"]),
 )

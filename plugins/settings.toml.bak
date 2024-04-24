@@ -1,4 +1,5 @@
 [bot_config]
+accesstoken = xxxxxxxx
 bot_proj_name = "MeloInf"
 bot_proj_ver = "1.0.0a1"
 bot_proj_src = "https://github.com/aicorein/MeloInf"
@@ -7,7 +8,8 @@ bot_nickname = "meloinf"
 uni_cmd_start = ["*"]
 uni_cmd_sep = [' ']
 uni_default_flag = '/'
-owner = xxxxxxxx
+owner_id = xxxxxxxx
+owner_name = "xxxxx"
 super_users = []
 white_users = []
 black_users = []
@@ -22,6 +24,7 @@ baidu_translate_key = "xxxxxxxx"
 hash_salt = "xxxxxxxx"
 everyday_news_time = "08:00:00"
 everyday_news_group = []
+moonshot_key = "xxxxx"
 
 [request_headers]
 User-Agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'

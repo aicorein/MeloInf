@@ -1,7 +1,7 @@
 from melobot import User, msg_args, msg_event, send, send_reply, thisbot
 from melobot.models import image_msg
 
-from ..env import BOT_INFO, CHECKER_GEN
+from ..env import BOT_INFO, CHECKER_FACTORY
 from ..public_utils import base64_encode
 from ._iface import PluginRef, PluginSpace, auth, info, life, status
 
@@ -36,7 +36,7 @@ async def info() -> None:
 
 @auth
 async def auth() -> None:
-    u_level = CHECKER_GEN.gen_base()._get_level(msg_event())
+    u_level = CHECKER_FACTORY.get_base()._get_level(msg_event())
     alist = [
         BOT_NICKNAME,
         u_level >= User.OWNER,
@@ -53,7 +53,7 @@ async def auth() -> None:
 @status
 async def status() -> None:
     all_plugins = thisbot.get_plugins()
-    output = " ● 启动时间：{}\n ● 已运行：{}\n ● 连接适配器冷却：{}s\n ● 已加载插件：\n{}".format(
+    output = " ● 启动时间：{}\n ● 已运行：{}\n ● 行为操作冷却：{}s\n ● 已加载插件：\n{}".format(
         PluginSpace.format_start_moment,
         PluginSpace.get_format_running_time(),
         thisbot.connector.cd_time,
@@ -65,7 +65,7 @@ async def status() -> None:
 
 @life
 async def life() -> None:
-    option = msg_args().pop(0)
+    option = msg_args()[0]
     match option:
         case "on":
             if thisbot.is_activate():

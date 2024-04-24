@@ -19,19 +19,19 @@ class PluginSpace:
     cq_other_infos: dict = {}
 
 
-def space_share(name: str):
-    plugin.on_share(plugin.__id__, name, lambda: getattr(PluginSpace, name))
+def share_var(name: str):
+    plugin.on_share(name, reflector=lambda: getattr(PluginSpace, name))
 
 
-space_share("bot_name")
-space_share("bot_id")
-space_share("cq_app_name")
-space_share("cq_app_ver")
-space_share("cq_protocol_ver")
-space_share("cq_other_infos")
+share_var("bot_name")
+share_var("bot_id")
+share_var("cq_app_name")
+share_var("cq_app_ver")
+share_var("cq_protocol_ver")
+share_var("cq_other_infos")
 
 
-@plugin.on_signal("BaseUtils", "txt2img")
+@plugin.on_signal("txt2img")
 async def txt_to_img(
     s: str,
     wrap_len: int = 70,
@@ -51,7 +51,7 @@ async def txt_to_img(
     return imgio.getvalue()
 
 
-@plugin.on_signal("BaseUtils", "txt2msgs")
+@plugin.on_signal("txt2msgs")
 async def txt2msgs(s: str, one_msg_len: int = 300):
     txt_list = list(map(lambda x: x.strip("\n"), wrap_s(s, one_msg_len)))
     return [text_msg(txt) for txt in txt_list]
@@ -59,7 +59,7 @@ async def txt2msgs(s: str, one_msg_len: int = 300):
 
 @plugin.on_connected
 async def login_info() -> None:
-    resp = await get_login_info()
+    resp = await get_login_info().resp
     if resp.is_ok():
         PluginSpace.bot_name = resp.data["nickname"]
         PluginSpace.bot_id = resp.data["user_id"]
@@ -70,12 +70,12 @@ async def login_info() -> None:
 
 @plugin.on_connected
 async def get_version_info() -> None:
-    resp = await get_onebot_version()
+    resp = await get_onebot_version().resp
     if resp.is_ok():
         PluginSpace.cq_app_name = resp.data.pop("app_name")
         PluginSpace.cq_app_ver = resp.data.pop("app_version")
         PluginSpace.cq_protocol_ver = resp.data.pop("protocol_version")
         PluginSpace.cq_other_infos = resp.data
-        thisbot.logger.info("成功获得 onebot 前端实现的信息并存储")
+        thisbot.logger.info("成功获得 onebot 实现程序的信息并存储")
     else:
-        thisbot.logger.warning("获取 onebot 前端实现的信息失败")
+        thisbot.logger.warning("获取 onebot 实现程序的信息失败")

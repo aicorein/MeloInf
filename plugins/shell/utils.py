@@ -7,7 +7,7 @@ import psutil
 from melobot import thisbot
 from melobot.base.exceptions import BotException
 from melobot.base.typing import MsgSegment
-from melobot.context import send_custom_msg
+from melobot.context import send_custom
 from melobot.models import image_msg
 
 from ..public_utils import base64_encode
@@ -63,7 +63,7 @@ async def _output_watch(stream: aio.StreamReader) -> None:
                     continue
                 else:
                     if Space.pointer:
-                        Space._buf.append((time.time(), output))
+                        Space._buf.append((time.perf_counter(), output))
             except Exception as e:
                 thisbot.logger.warning(f"IShell 输出转发遇到问题，警告：{e}")
     except aio.CancelledError:
@@ -81,7 +81,7 @@ async def _buf_monitor() -> None:
         while True:
             if len(Space._buf) == 0:
                 pass
-            elif abs(Space._buf[-1][0] - time.time()) <= Space._cache_time:
+            elif abs(Space._buf[-1][0] - time.perf_counter()) <= Space._cache_time:
                 pass
             else:
                 s = "\n".join([t[1] for t in Space._buf])
@@ -99,7 +99,7 @@ async def _buf_monitor() -> None:
                         msg = image_msg(b64_data)
                     else:
                         msg = s
-                    await send_custom_msg(msg, p[1], p[0], p[2])
+                    await send_custom(msg, p[1], p[0], p[2])
             await aio.sleep(0.2)
     except aio.CancelledError:
         pass

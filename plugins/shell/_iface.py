@@ -13,7 +13,7 @@ plugin = BotPlugin("ShellManager", version="1.3.0")
 
 class PluginSpace:
     cwd = this_dir()
-    meta_info = MetaInfo()
+    meta_info = MetaInfo
     shell: aio.subprocess.Process
     executable = "powershell" if meta_info.PLATFORM == "win32" else "sh"
     encoding = "utf-8" if meta_info.PLATFORM != "win32" else "gbk"
@@ -36,7 +36,7 @@ shell = plugin.on_message(
     parser=CmdParser(
         cmd_start="*",
         cmd_sep="$$",
-        target="shell",
+        targets="shell",
         formatters=[Format(src_desc="命令内容", src_expect="字符串", default=None)],
     ),
 )

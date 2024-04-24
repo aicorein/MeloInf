@@ -14,7 +14,7 @@ from melobot import (
     thisbot,
 )
 
-from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, get_white_checker
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_FACTORY, get_white_checker
 from ..public_utils import remove_ask_punctuation, remove_punctuation
 from .dict import BOT_FLAG, OWNER_FLAG, SENDER_FLAG, WORD_DICT, add_pair
 
@@ -33,7 +33,7 @@ class PluginRef:
 make_reply = plugin.on_message(checker=COMMON_CHECKER)
 
 words_info = plugin.on_message(
-    checker=COMMON_CHECKER, parser=PARSER_GEN.gen(["w-info", "词库信息"])
+    checker=COMMON_CHECKER, parser=PARSER_FACTORY.get(["w-info", "词库信息"])
 )
 
 teach = plugin.on_message(
@@ -41,7 +41,7 @@ teach = plugin.on_message(
     parser=CmdParser(
         cmd_start="*",
         cmd_sep="##",
-        target=["w-teach", "词条扩充"],
+        targets=["w-teach", "词条扩充"],
         formatters=[
             Format(
                 verify=lambda x: len(x) <= 20 and "##" not in x,
@@ -85,7 +85,7 @@ def get_random_reply(keys: List[str]) -> str:
     if SENDER_FLAG in output:
         output = output.replace(SENDER_FLAG, f"[CQ:at,qq={msg_event().sender.id}] ")
     if OWNER_FLAG in output:
-        output = output.replace(OWNER_FLAG, f"[CQ:at,qq={BOT_INFO.owner}] ")
+        output = output.replace(OWNER_FLAG, f"[CQ:at,qq={BOT_INFO.owner_id}] ")
     if output != "":
         if random() < PluginSpace.special_prob:
             output = "[恭喜你触发了这条千分之一概率的隐藏回复]"

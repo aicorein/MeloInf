@@ -1,7 +1,6 @@
 from melobot import BotPlugin
 from melobot import CmdArgFormatter as Format
-from melobot import CmdParser, msg_args, send_reply, timelimit
-from melobot.base.exceptions import BotException
+from melobot import CmdParser, msg_args, reply_finish, send_reply, thisbot, timelimit
 
 from ..env import BOT_INFO, COMMON_CHECKER
 from ..public_utils import async_http, get_headers
@@ -15,7 +14,7 @@ code_c = plugin.on_message(
     parser=CmdParser(
         cmd_start=["~", "～"],
         cmd_sep="$",
-        target=["code", "代码"],
+        targets=["code", "代码"],
         formatters=[
             Format(
                 convert=lambda x: x.lower(),
@@ -50,7 +49,7 @@ async def codec() -> None:
     await send_reply(output)
 
 
-@plugin.on_signal("CodeCompiler", "do_calc")
+@plugin.on_signal("do_calc")
 async def do_calc(expression: str, lang_id: int, ext: str) -> str:
     code = f"print(eval('{expression}'))"
     output = await compile(code, lang_id, ext)
@@ -72,8 +71,8 @@ async def compile(code: str, lang_id: int, ext: str) -> str:
     }
     async with async_http(url, "post", headers=gen_headers(), data=data) as resp:
         if resp.status != 200:
-            await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
-            raise BotException(f"远端编译请求失败：{resp.status}")
+            thisbot.logger.error(f"远端编译请求失败，状态码：{resp.status}")
+            await reply_finish("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
         try:
             ret = await resp.json()
             if ret["errors"] != "\n\n":
@@ -83,4 +82,4 @@ async def compile(code: str, lang_id: int, ext: str) -> str:
             return output
         except Exception as e:
             await send_reply("远端编译请求失败...请稍后再试，或联系 bot 管理员解决")
-            raise BotException(f"远端编译请求异常：{e.__class__.__name__} {e}")
+            raise

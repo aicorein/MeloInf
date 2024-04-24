@@ -43,12 +43,15 @@ async def async_http(
     headers: Optional[dict] = None,
     params: Optional[dict] = None,
     data: Optional[dict] = None,
+    json: Optional[dict] = None,
     proxy: bool = False,
 ) -> AsyncGenerator[aiohttp.ClientResponse, None]:
     async with aiohttp.ClientSession(headers=headers) as http_session:
         kwargs = {}
         if proxy:
             kwargs["proxy"] = BOT_INFO.request_proxy
+        if json:
+            kwargs["json"] = json
         if params:
             kwargs["params"] = params
         if method == "get":

@@ -3,4 +3,4 @@ toml>=0.10.2
 psutil>=5.9.8
 matplotlib>=3.8.2
 pillow>=10.2.0
-melobot>=2.5.10
+melobot>=2.6.2

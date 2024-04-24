@@ -7,13 +7,13 @@ from melobot import BotPlugin
 from melobot import CmdArgFormatter as Format
 from melobot import MetaInfo, PriorLevel, send, send_reply, thisbot
 
-from ..env import BOT_INFO, COMMON_CHECKER, PARSER_GEN, get_owner_checker
+from ..env import BOT_INFO, COMMON_CHECKER, PARSER_FACTORY, get_owner_checker
 
 plugin = BotPlugin("LifeCycleUtils", "2.0.0")
 
 
 class PluginSpace:
-    meta_info = MetaInfo()
+    meta_info = MetaInfo
     bot_nickname = BOT_INFO.bot_nickname
     bot_backend_str = """【bot backend】
 name：{}
@@ -58,30 +58,25 @@ class PluginRef:
         return await thisbot.get_share("BaseUtils", "cq_other_infos").val
 
 
+plugin.on_share("start_moment", reflector=lambda: getattr(PluginSpace, "start_moment"))
 plugin.on_share(
-    plugin.__id__, "start_moment", lambda: getattr(PluginSpace, "start_moment")
-)
-plugin.on_share(
-    plugin.__id__,
     "format_start_moment",
-    lambda: getattr(PluginSpace, "format_start_moment"),
+    reflector=lambda: getattr(PluginSpace, "format_start_moment"),
 )
-plugin.on_share(plugin.__id__, "running_time", PluginSpace.get_running_time)
-plugin.on_share(
-    plugin.__id__, "format_running_time", PluginSpace.get_format_running_time
-)
+plugin.on_share("running_time", reflector=PluginSpace.get_running_time)
+plugin.on_share("format_running_time", reflector=PluginSpace.get_format_running_time)
 
 
 info = plugin.on_message(
-    parser=PARSER_GEN.gen(target=["info", "信息"]), checker=COMMON_CHECKER
+    parser=PARSER_FACTORY.get(targets=["info", "信息"]), checker=COMMON_CHECKER
 )
 
 auth = plugin.on_message(
-    parser=PARSER_GEN.gen(target=["auth", "权限"]), checker=COMMON_CHECKER
+    parser=PARSER_FACTORY.get(targets=["auth", "权限"]), checker=COMMON_CHECKER
 )
 
 status = plugin.on_message(
-    parser=PARSER_GEN.gen(target=["status", "状态"]), checker=COMMON_CHECKER
+    parser=PARSER_FACTORY.get(targets=["status", "状态"]), checker=COMMON_CHECKER
 )
 
 life = plugin.on_message(
@@ -91,8 +86,8 @@ life = plugin.on_message(
     session_rule=AttrRule("sender", "id"),
     conflict_cb=lambda: send("工作状态切换中...稍后再试~"),
     priority=PriorLevel.MIN,
-    parser=PARSER_GEN.gen(
-        target=["life", "状态设置"],
+    parser=PARSER_FACTORY.get(
+        targets=["life", "状态设置"],
         formatters=[
             Format(
                 verify=lambda x: x in ["on", "off", "stop"],

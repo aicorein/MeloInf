@@ -16,13 +16,15 @@ async def execute(text: str) -> None:
             await finish("shell 交互模式已关闭")
         case "$\\n$":
             intput_send("\n")
+        case "exit":
+            await finish("请使用 $e$ 退出，而不是 exit")
         case _:
             intput_send(text)
 
 
 @shell
 async def run_in_shell() -> None:
-    cmd = msg_args().pop(0)
+    cmd = msg_args()[0]
     if cmd is None:
         event = msg_event()
         Space.pointer = (
