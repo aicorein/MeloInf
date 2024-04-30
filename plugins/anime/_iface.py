@@ -15,5 +15,6 @@ anime_recognize = plugin.on_message(
     parser=PARSER_FACTORY.get(["番剧识别", "anime"]),
     session_rule=AttrSessionRule("sender", "id"),
     direct_rouse=True,
+    conflict_wait=False,
     conflict_cb=lambda: send("你已触发一个识番任务，拒绝再次触发"),
 )

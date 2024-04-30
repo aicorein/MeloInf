@@ -77,6 +77,6 @@ async def life() -> None:
             await send(f"{BOT_NICKNAME} 去休息了~")
             thisbot.slack()
         case "stop":
-            await send(f"{BOT_NICKNAME} 下班啦~", wait=True)
+            await send(f"{BOT_NICKNAME} 下班啦~", wait=True).wait()
             thisbot.logger.info("指令触发停止操作，正在关闭 bot")
             await thisbot.close()

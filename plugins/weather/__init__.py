@@ -81,9 +81,7 @@ async def weather() -> None:
     ) as resp:
         if resp.status != 200:
             thisbot.logger.error(f"请求失败：{resp.status}")
-            await reply_finish(
-                "城市当前天气获取失败...请稍后再试，或联系 bot 管理员解决"
-            )
+            await reply_finish("城市当前天气获取失败...请稍后再试，或联系 bot 管理员解决")
         else:
             res = await resp.json()
 
@@ -97,9 +95,7 @@ async def weather() -> None:
     ) as resp:
         if resp.status != 200:
             thisbot.logger.error(f"请求失败：{resp.status}")
-            await reply_finish(
-                "城市多天天气获取失败...请稍后再试，或联系 bot 管理员解决"
-            )
+            await reply_finish("城市多天天气获取失败...请稍后再试，或联系 bot 管理员解决")
         else:
             res = await resp.json()
 
@@ -122,4 +118,4 @@ async def weather() -> None:
     output += f"\n【详细参见】{link}"
     await send(output)
     fig_b64 = gen_weather_fig(min_temps[:days], max_temps[:days])
-    await send(image_msg(fig_b64), wait=True)
+    await send(image_msg(fig_b64), wait=True).wait()

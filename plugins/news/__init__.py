@@ -2,7 +2,7 @@ import asyncio
 import datetime
 
 from melobot import BotPlugin, reply_finish, send, thisbot
-from melobot.base.tools import async_at, to_task
+from melobot.base.tools import async_at
 from melobot.context import send_custom
 from melobot.models import image_msg
 
@@ -56,7 +56,7 @@ async def news_arrange() -> None:
             if data is None:
                 return
             for g in PluginSpace.news_group:
-                to_task(send_custom(image_msg(data), False, groupId=g))
+                send_custom(image_msg(data), False, groupId=g)
 
         try:
             await async_at(news_launch(), news_t.timestamp())

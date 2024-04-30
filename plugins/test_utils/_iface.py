@@ -36,7 +36,8 @@ stest = plugin.on_message(
     checker=get_su_checker(fail_cb=lambda: send_reply("你无权使用【会话测试】功能")),
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
-    conflict_cb=lambda: send("其他的 session 测试进行中...稍后再试"),
+    conflict_wait=False,
+    conflict_cb=lambda: send("其他的会话测试进行中...稍后再试"),
     parser=PARSER_FACTORY.get(targets=["会话测试", "stest", "session-test"]),
 )
 
@@ -59,6 +60,7 @@ core_debug = plugin.on_message(
     parser=PARSER_FACTORY.get(targets=["核心调试", "core-debug"]),
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
+    conflict_wait=False,
     conflict_cb=lambda: send("已进入核心调试状态， 拒绝重复进入该状态"),
 )
 

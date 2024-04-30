@@ -32,6 +32,7 @@ shell = plugin.on_message(
     checker=get_owner_checker(fail_cb=lambda: send_reply("你无权使用【命令行】功能")),
     session_rule=AttrRule("sender", "id"),
     direct_rouse=True,
+    conflict_wait=False,
     conflict_cb=lambda: send("已在运行交互式 shell"),
     parser=CmdParser(
         cmd_start="*",

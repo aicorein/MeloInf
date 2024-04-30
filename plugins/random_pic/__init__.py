@@ -53,7 +53,7 @@ async def random_pic() -> None:
         try:
             data = await resp.read()
             code = base64_encode(data)
-            await send(image_msg(code), wait=True)
+            await send(image_msg(code), wait=True).wait()
         except Exception as e:
             await send_reply("图片获取失败...请稍后再试")
             raise

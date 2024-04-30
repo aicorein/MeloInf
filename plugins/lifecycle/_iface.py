@@ -84,7 +84,6 @@ life = plugin.on_message(
         fail_cb=lambda: send_reply("你无权使用【生命状态设置】功能")
     ),
     session_rule=AttrRule("sender", "id"),
-    conflict_cb=lambda: send("工作状态切换中...稍后再试~"),
     priority=PriorLevel.MIN,
     parser=PARSER_FACTORY.get(
         targets=["life", "状态设置"],
