@@ -2,12 +2,29 @@ from melobot.plugin import SyncShare
 
 
 class Store:
-    onebot_name: str = "<尚未获取>"
+    bot_info: str = (
+        "[Core]\n"
+        "name：{}\n"
+        "core：{} {}\n"
+        "proj：{} {}\n"
+        "src：{}\n"
+        "python：{} | {}\n"
+        "adapters：{}\n"
+        "plugins：{}"
+    )
+    onebot_name: str = "<unkown>"
     onebot_id: int = -1
-    onebot_app_name: str = "<尚未获取>"
-    onebot_app_ver: str = "<尚未获取>"
-    onebot_protocol_ver: str = "<尚未获取>"
+    onebot_app_name: str = "<unkown>"
+    onebot_app_ver: str = "<unkown>"
+    onebot_protocol_ver: str = "<unkown>"
     onebot_other_infos: dict[str, str] = {}
+    onebot_info_str: str = (
+        "[OneBot]\n"
+        "app：{}\n"
+        "ver：{}\n"
+        "protocol_ver：{}\n"
+        "other_info：{}"
+    )
 
 
 def add_share(name: str) -> SyncShare:
