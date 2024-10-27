@@ -1,0 +1,21 @@
+[project]
+name = "meloinf"
+version = "0.1.0"
+description = "A cross platform bot base on melobot."
+authors = [
+    {name = "aicorein", email = "aicorein@meloland.org"},
+]
+dependencies = [
+    "melobot[onebot]>=3.0.0rc13",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "AGPL3"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
