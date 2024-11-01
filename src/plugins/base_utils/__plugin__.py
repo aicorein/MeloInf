@@ -36,7 +36,7 @@ class BaseUtils(Plugin):
 bot = get_bot()
 
 
-@bot.on_loaded
+@bot.on_started
 async def get_onebot_login_info(adapter: Adapter, logger: GenericLogger) -> None:
     with EchoRequireCtx().in_ctx(True):
         echo = await (await adapter.get_login_info())[0]
@@ -49,7 +49,7 @@ async def get_onebot_login_info(adapter: Adapter, logger: GenericLogger) -> None
         logger.warning("获取 OneBot 账号信息失败")
 
 
-@bot.on_loaded
+@bot.on_started
 async def get_onebot_app_info(adapter: Adapter, logger: GenericLogger) -> None:
     with EchoRequireCtx().in_ctx(True):
         echo = await (await adapter.get_version_info())[0]

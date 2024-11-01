@@ -10,12 +10,7 @@ from melobot.protocols.onebot.v11.utils import CmdParser, ParseArgs
 from melobot.utils import lock
 
 from ...env import ENVS
-from ...platform.onebot import (
-    COMMON_CHECKER,
-    PARSER_FACTORY,
-    FormatCb,
-    get_white_checker,
-)
+from ...platform.onebot import COMMON_CHECKER, PARSER_FACTORY, FormatCb, get_white_checker
 from ...utils import ENG_PUNC, HANS_PUNC, remove_punctuation
 from .. import base_utils as BASE_INFO
 from .wdict import BOT_FLAG, OWNER_FLAG, SENDER_FLAG, WORD_DICT, add_pair

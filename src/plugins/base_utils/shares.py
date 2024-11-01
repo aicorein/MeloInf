@@ -19,11 +19,7 @@ class Store:
     onebot_protocol_ver: str = "<unkown>"
     onebot_other_infos: dict[str, str] = {}
     onebot_info_str: str = (
-        "[OneBot]\n"
-        "app：{}\n"
-        "ver：{}\n"
-        "protocol_ver：{}\n"
-        "other_info：{}"
+        "[OneBot]\n" "app：{}\n" "ver：{}\n" "protocol_ver：{}\n" "other_info：{}"
     )
 
 
