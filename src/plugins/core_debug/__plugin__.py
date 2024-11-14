@@ -1,9 +1,9 @@
 import importlib
-from typing import Callable
+from typing import Annotated, Callable
 
 from melobot import Plugin, get_bot, send_text
-from melobot.di import Depends
-from melobot.handle import get_event, stop
+from melobot.di import Depends, Reflect
+from melobot.handle import stop
 from melobot.protocols.onebot.v11 import Adapter, on_message
 from melobot.protocols.onebot.v11.adapter.event import MessageEvent
 from melobot.protocols.onebot.v11.adapter.segment import ImageSegment
@@ -33,15 +33,10 @@ async def format_send(send_func: Callable, s: str) -> None:
         await send_func(ImageSegment(file=data))
 
 
-def get_text() -> str:
-    assert isinstance(event := get_event(), MessageEvent)
-    return event.text
-
-
 @on_message(checker=COMMON_CHECKER)
 async def core_dbg(
     adapter: Adapter,
-    event: MessageEvent,
+    ev: Annotated[MessageEvent, Reflect()],
     rule: Rule = Depends(
         lambda: Rule[MessageEvent].new(lambda e1, e2: e1.scope == e2.scope),
         cache=True,
@@ -61,11 +56,11 @@ async def core_dbg(
     ),
 ) -> None:
     async with enter_session(rule):
-        res = await parser.parse(event.text)
+        res = await parser.parse(ev.text)
         if res is None:
             return
 
-        if not await checker.check(event):
+        if not await checker.check(ev.__origin__):
             return
 
         await send_text(
@@ -86,7 +81,7 @@ async def core_dbg(
         while True:
             await suspend()
 
-            match (get_text()):
+            match ev.text:
                 case "$e$":
                     await send_text("已退出核心调试状态")
                     await stop()
@@ -98,7 +93,7 @@ async def core_dbg(
                     await suspend()
 
                     try:
-                        text = get_text()
+                        text = ev.text
                         if text == "$e$":
                             await send_text("已退出导入操作")
                             continue
@@ -124,7 +119,7 @@ async def core_dbg(
                     await suspend()
 
                     try:
-                        text = get_text()
+                        text = ev.text
                         if text == "$e$":
                             await send_text("已退出修改操作")
                             continue
@@ -140,7 +135,7 @@ async def core_dbg(
 
                 case _:
                     try:
-                        text = get_text()
+                        text = ev.text
                         val = eval(f"{text}", var_map)  # pylint: disable=eval-used
                         pointer = text
                         await format_send(adapter.send_reply, str(val))
