@@ -38,7 +38,7 @@ bot = get_bot()
 
 @bot.on_started
 async def get_onebot_login_info(adapter: Adapter, logger: GenericLogger) -> None:
-    with EchoRequireCtx().in_ctx(True):
+    with EchoRequireCtx().unfold(True):
         echo = await (await adapter.get_login_info())[0]
     data = echo.data
     if echo.is_ok():
@@ -51,7 +51,7 @@ async def get_onebot_login_info(adapter: Adapter, logger: GenericLogger) -> None
 
 @bot.on_started
 async def get_onebot_app_info(adapter: Adapter, logger: GenericLogger) -> None:
-    with EchoRequireCtx().in_ctx(True):
+    with EchoRequireCtx().unfold(True):
         echo = await (await adapter.get_version_info())[0]
     data = echo.data
     if echo.is_ok():

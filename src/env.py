@@ -1,8 +1,6 @@
 import pathlib
 import tomllib
 
-from melobot.utils import singleton
-
 dir_path = pathlib.Path(__file__).parent
 env_path = dir_path.joinpath("env.toml")
 with open(env_path, mode="rb") as fp:
@@ -19,7 +17,6 @@ def to_abs_path(path: str) -> str:
     return str(dir_path.joinpath(_path).resolve(True))
 
 
-@singleton
 class BotEnvs:
     def __init__(self) -> None:
         self.proj_name: str = BOT_CONFIG["bot_proj_name"]
@@ -42,7 +39,6 @@ class BotEnvs:
         self.moonshot_key: str = BOT_CONFIG["moonshot_key"]
 
 
-@singleton
 class OneBotEnvs:
     def __init__(self) -> None:
         self.access_token: str = ONEBOT_CONFIG["access_token"]
@@ -56,7 +52,6 @@ class OneBotEnvs:
         self.news_gruop: list[int] = ONEBOT_CONFIG["everyday_news_group"]
 
 
-@singleton
 class Envs:
     def __init__(self) -> None:
         self.bot = BotEnvs()
