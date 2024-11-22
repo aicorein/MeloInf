@@ -2,12 +2,13 @@ import re
 from random import choice, random
 
 from melobot import Plugin, get_bot, send_text
+from melobot.handle import get_event, stop
 from melobot.protocols.onebot.v11 import Adapter, on_message
 from melobot.protocols.onebot.v11.adapter.event import MessageEvent
 from melobot.protocols.onebot.v11.handle import GetParseArgs
 from melobot.protocols.onebot.v11.utils import CmdArgFormatter as Fmtter
 from melobot.protocols.onebot.v11.utils import CmdParser, ParseArgs
-from melobot.utils import lock
+from melobot.utils import if_not, lock
 
 from ...env import ENVS
 from ...platform.onebot import COMMON_CHECKER, PARSER_FACTORY, FormatCb, get_white_checker
@@ -79,18 +80,11 @@ _wlib_teach_check = get_white_checker(
         ],
     ),
 )
-async def wlib_teach(
-    adapter: Adapter, event: MessageEvent, args: ParseArgs = GetParseArgs()
-) -> None:
-    if not (await _wlib_teach_check.check(event)):
-        return
-    await _teach_pair(adapter, args)
-
-
+@if_not(lambda: _wlib_teach_check.check(get_event()), reject=stop)
 @lock(
     lambda: OB_ADAPTER.send_reply(f"{NICKNAME} 学不过来啦，等 {NICKNAME} 先学完上一句嘛~")
 )
-async def _teach_pair(adapter: Adapter, args: ParseArgs) -> None:
+async def wlib_teach(adapter: Adapter, args: ParseArgs = GetParseArgs()) -> None:
     ask, ans = args.vals
     punc = ENG_PUNC.replace("$", "") + HANS_PUNC
     ask = re.sub(rf"[{re.escape(punc)}]", "", ask)

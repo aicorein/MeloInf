@@ -1,4 +1,5 @@
 from melobot import Plugin, send_text
+from melobot.di import inject_deps
 from melobot.handle import stop
 from melobot.protocols.onebot.v11 import Adapter, on_message
 from melobot.protocols.onebot.v11.adapter.event import GroupMessageEvent
@@ -12,6 +13,7 @@ from ...platform.onebot import COMMON_CHECKER, get_owner_checker
 class GroupTitle(Plugin):
     flag = False
     flag_rw = RWContext()
+    owner_checker = get_owner_checker()
 
     def __init__(self) -> None:
         super().__init__()
@@ -19,7 +21,11 @@ class GroupTitle(Plugin):
         self.flows = (title_manager,)
 
 
-OWNER_CHECKER = get_owner_checker()
+@inject_deps
+async def owner_check(adapter: Adapter, event: GroupMessageEvent) -> None:
+    if not await GroupTitle.owner_checker.check(event):
+        await adapter.send_reply("无权执行此操作")
+        await stop()
 
 
 @on_message(checker=COMMON_CHECKER, parser=CmdParser("!", "$", ["title", "头衔"]))
@@ -43,22 +49,16 @@ async def title_manager(
                 )
 
         case "enable" | "启用" | "开启":
-            await owner_check(adapter, event)
+            await owner_check()  # pylint: disable=no-value-for-parameter
             async with GroupTitle.flag_rw.write():
                 GroupTitle.flag = True
                 return await send_text("群头衔相关功能已启用 ✅")
 
         case "disable" | "禁用" | "关闭" | "禁用":
-            await owner_check(adapter, event)
+            await owner_check()  # pylint: disable=no-value-for-parameter
             async with GroupTitle.flag_rw.write():
                 GroupTitle.flag = False
                 return await send_text("群头衔相关功能已禁用 ✅")
 
         case _:
             return await send_text("不支持的群头衔功能指令")
-
-
-async def owner_check(adapter: Adapter, event: GroupMessageEvent) -> None:
-    if not await OWNER_CHECKER.check(event):
-        await adapter.send_reply("无权执行此操作")
-        await stop()
