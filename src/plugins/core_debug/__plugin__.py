@@ -1,13 +1,14 @@
 import importlib
 from typing import Annotated, Callable
 
-from melobot import Plugin, get_bot, send_text
+import melobot
+from melobot import PluginPlanner, get_bot, send_text
 from melobot.di import Reflect
 from melobot.handle import get_event, stop
-from melobot.protocols.onebot.v11 import Adapter, on_message
+from melobot.protocols.onebot.v11 import Adapter, msg_session, on_message
 from melobot.protocols.onebot.v11.adapter.event import MessageEvent
 from melobot.protocols.onebot.v11.adapter.segment import ImageSegment
-from melobot.session import Rule, enter_session, suspend
+from melobot.session import suspend
 from melobot.utils import if_not, unfold_ctx
 
 from ...platform.onebot import COMMON_CHECKER, PARSER_FACTORY, get_owner_checker
@@ -15,19 +16,16 @@ from ...utils import base64_encode
 from .. import base_utils
 
 
-class CoreDbg(Plugin):
+class Store:
     checker = get_owner_checker(
         fail_cb=lambda: get_bot()
         .get_adapter(Adapter)
         .send_reply("你无权使用【核心调试】功能")
     )
     parser = PARSER_FACTORY.get(["核心调试", "core-dbg"])
-    rule = Rule[MessageEvent].new(lambda e1, e2: e1.scope == e2.scope)
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.version = "1.0.0"
-        self.flows = (core_dbg,)
+
+CoreDbg = PluginPlanner("1.1.0")
 
 
 async def format_send(send_func: Callable, s: str) -> None:
@@ -41,12 +39,12 @@ async def format_send(send_func: Callable, s: str) -> None:
         await send_func(ImageSegment(file=data))
 
 
+@CoreDbg.use
 @on_message(checker=COMMON_CHECKER)
-@unfold_ctx(lambda: enter_session(CoreDbg.rule))
-@if_not(lambda: CoreDbg.parser.parse(get_event().text), reject=stop)
-@if_not(lambda: CoreDbg.checker.check(get_event()), reject=stop)
+@unfold_ctx(msg_session)
+@if_not(lambda: Store.parser.parse(get_event().text), reject=stop)
+@if_not(lambda: Store.checker.check(get_event()), reject=stop)
 async def core_dbg(adapter: Adapter, ev: Annotated[MessageEvent, Reflect()]) -> None:
-
     await send_text(
         "【你已进入核心调试状态】\n" + "注意 ⚠️：错误操作可能导致崩溃，请谨慎操作！"
     )
@@ -60,7 +58,7 @@ async def core_dbg(adapter: Adapter, ev: Annotated[MessageEvent, Reflect()]) -> 
 
     pointer = None
     imports = {}
-    var_map = {"bot": get_bot()}
+    var_map = {"bot": get_bot(), "melobot": melobot}
 
     while True:
         await suspend()

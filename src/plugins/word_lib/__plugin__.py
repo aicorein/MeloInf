@@ -1,7 +1,7 @@
 import re
 from random import choice, random
 
-from melobot import Plugin, get_bot, send_text
+from melobot import PluginPlanner, get_bot, send_text
 from melobot.handle import get_event, stop
 from melobot.protocols.onebot.v11 import Adapter, on_message
 from melobot.protocols.onebot.v11.adapter.event import MessageEvent
@@ -32,14 +32,34 @@ NICKNAME = NICKNAMES[-1]
 OB_OWNER_NAME = ENVS.onebot.owner_names[0]
 OB_OWNER_ID = ENVS.onebot.owner_id
 
+TEACH_PARSER = CmdParser(
+    cmd_start="*",
+    cmd_sep="##",
+    targets=["wlib-teach", "词条扩充"],
+    fmtters=[
+        Fmtter(
+            validate=lambda x: len(x) <= 20 and "##" not in x,
+            src_desc="触发语句",
+            src_expect="字符数 <= 20 且不包含 ## 符号",
+            **_fmt_err_cbs,
+        ),
+        Fmtter(
+            validate=lambda x: len(x) <= 200 and "##" not in x,
+            src_desc="回复语句",
+            src_expect="字符数 <= 200 且不包含 ## 符号",
+            **_fmt_err_cbs,
+        ),
+    ],
+)
+TEACH_CHECKER = get_white_checker(
+    fail_cb=lambda: OB_ADAPTER.send_reply("你无权使用【词条扩充】功能")
+)
 
-class WordLib(Plugin):
-    def __init__(self) -> None:
-        super().__init__()
-        self.version = "1.4.0"
-        self.flows = (make_reply, get_wlib_info, wlib_teach)
+
+WordLib = PluginPlanner("1.4.0")
 
 
+@WordLib.use
 @on_message(checker=COMMON_CHECKER)
 async def make_reply(event: MessageEvent) -> None:
     keys = await get_keys(event)
@@ -48,39 +68,15 @@ async def make_reply(event: MessageEvent) -> None:
         await send_text(output)
 
 
+@WordLib.use
 @on_message(checker=COMMON_CHECKER, parser=PARSER_FACTORY.get(["wlib-info", "词库信息"]))
 async def get_wlib_info() -> None:
     await send_text(f"● 当前加载词库文件：words.txt\n● 词条数：{len(WORD_DICT)}")
 
 
-_wlib_teach_check = get_white_checker(
-    fail_cb=lambda: OB_ADAPTER.send_reply("你无权使用【词条扩充】功能")
-)
-
-
-@on_message(
-    checker=COMMON_CHECKER,
-    parser=CmdParser(
-        cmd_start="*",
-        cmd_sep="##",
-        targets=["wlib-teach", "词条扩充"],
-        fmtters=[
-            Fmtter(
-                validate=lambda x: len(x) <= 20 and "##" not in x,
-                src_desc="触发语句",
-                src_expect="字符数 <= 20 且不包含 ## 符号",
-                **_fmt_err_cbs,
-            ),
-            Fmtter(
-                validate=lambda x: len(x) <= 200 and "##" not in x,
-                src_desc="回复语句",
-                src_expect="字符数 <= 200 且不包含 ## 符号",
-                **_fmt_err_cbs,
-            ),
-        ],
-    ),
-)
-@if_not(lambda: _wlib_teach_check.check(get_event()), reject=stop)
+@WordLib.use
+@on_message(checker=COMMON_CHECKER, parser=TEACH_PARSER)
+@if_not(lambda: TEACH_CHECKER.check(get_event()), reject=stop)
 @lock(
     lambda: OB_ADAPTER.send_reply(f"{NICKNAME} 学不过来啦，等 {NICKNAME} 先学完上一句嘛~")
 )

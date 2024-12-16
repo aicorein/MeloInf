@@ -1,6 +1,6 @@
 import platform
 
-from melobot import GenericLogger, MetaInfo, Plugin, get_bot, send_text
+from melobot import GenericLogger, MetaInfo, PluginPlanner, get_bot, send_text
 from melobot.protocols.onebot.v11 import Adapter, EchoRequireCtx, on_message
 
 from ...env import ENVS
@@ -16,21 +16,18 @@ from .shares import (
     onebot_protocol_ver,
 )
 
-
-class BaseUtils(Plugin):
-    def __init__(self) -> None:
-        super().__init__()
-        self.version = "1.3.0"
-        self.flows = (reply_info,)
-        self.shares = (
-            onebot_app_name,
-            onebot_app_ver,
-            onebot_id,
-            onebot_name,
-            onebot_other_infos,
-            onebot_protocol_ver,
-        )
-        self.funcs = (txt2img, wrap_s)
+BaseUtils = PluginPlanner(
+    "1.3.0",
+    shares=[
+        onebot_app_name,
+        onebot_app_ver,
+        onebot_id,
+        onebot_name,
+        onebot_other_infos,
+        onebot_protocol_ver,
+    ],
+    funcs=[txt2img, wrap_s],
+)
 
 
 bot = get_bot()
@@ -64,6 +61,7 @@ async def get_onebot_app_info(adapter: Adapter, logger: GenericLogger) -> None:
         logger.warning("获取 onebot 实现程序的信息失败")
 
 
+@BaseUtils.use
 @on_message(parser=PARSER_FACTORY.get(targets=["info", "信息"]), checker=COMMON_CHECKER)
 async def reply_info() -> None:
     output = Store.bot_info.format(

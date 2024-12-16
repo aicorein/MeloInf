@@ -2,7 +2,7 @@ import math
 import random
 import string
 
-from melobot import Plugin, send_text
+from melobot import PluginPlanner, send_text
 from melobot.protocols.onebot.v11 import on_message
 from melobot.protocols.onebot.v11.handle import GetParseArgs
 from melobot.protocols.onebot.v11.utils import CmdArgFormatter as Fmtter
@@ -11,18 +11,14 @@ from melobot.protocols.onebot.v11.utils import ParseArgs
 from ...platform.onebot import COMMON_CHECKER, PARSER_FACTORY
 from .gen import BullShitGenerator
 
-
-class BullShitGen(Plugin):
-    def __init__(self) -> None:
-        super().__init__()
-        self.version = "1.1.0"
-        self.flows = (bullshit_gen, error_codes)
+BullShitGen = PluginPlanner("1.1.0")
 
 
 GEN_LENGTH = 200
 PUNC = string.punctuation + r"。，、；：？！…—·ˉ¨‘’“”々～‖∶＂＇｀〃．"
 
 
+@BullShitGen.use
 @on_message(
     checker=COMMON_CHECKER,
     parser=PARSER_FACTORY.get(
@@ -42,6 +38,7 @@ async def bullshit_gen(args: ParseArgs = GetParseArgs()) -> None:
     await send_text(output)
 
 
+@BullShitGen.use
 @on_message(
     checker=COMMON_CHECKER, parser=PARSER_FACTORY.get(targets=["乱码生成", "ecode"])
 )

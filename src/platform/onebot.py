@@ -60,7 +60,7 @@ COMMON_CHECKER = CHECKER_FACTORY.get_group(
 class FormatCb:
     @staticmethod
     async def convert_fail(info: FormatInfo) -> None:
-        e_class = info.exc.__class__.__qualname__
+        e_class = f"{info.exc.__class__.__module__}.{info.exc.__class__.__qualname__}"
         src = repr(info.src) if isinstance(info.src, str) else info.src
 
         tip = f"第 {info.idx + 1} 个参数"
